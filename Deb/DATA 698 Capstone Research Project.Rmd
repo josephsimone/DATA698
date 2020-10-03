@@ -98,8 +98,8 @@ DT::datatable(tbl_with_sources)
 
 ## Data Exploration
 
-Now, Let's use the mutate() funtion in the dplyr package to calculate average price for the stocks
+Now, Let's use the mutate() funtion in the dplyr package to calculate cpi
 
 ### References
 
-- https://stackoverflow.com/questions/11433432/how-to-import-multiple-csv-files-at-once
+- [How to import multiple .csv files at once?](https://stackoverflow.com/questions/11433432/how-to-import-multiple-csv-files-at-once)
