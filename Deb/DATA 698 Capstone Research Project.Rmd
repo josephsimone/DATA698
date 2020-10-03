@@ -40,7 +40,7 @@ library(tidyverse)
 library(kableExtra)
 library(lubridate)
 library(forecast)
-library(sjmisc)
+library(stringi)
 ```
 
 ### Load required Datasets
@@ -76,11 +76,20 @@ print(unique(tbl_with_sources$filename))
 ```{r load_files, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 tbl_with_sources <- tbl_with_sources %>%
                       mutate(industry = case_when(
-                                                  str_contains(filename, "mfg") ~ "Manufacturing",
-                                                  str_contains(filename, "manufacturing") ~ "Manufacturing",
-                                                  str_contains(filename, "electric_power") ~ "Utilities",
-                                                  str_contains(filename, "transportation") ~ "Transportation and warehousing",
-                                                  TRUE                      ~ NA_character_
+                                                  stri_detect_fixed(filename, "mfg") ~ "Manufacturing",
+                                                  stri_detect_fixed(filename, "manufacturing") ~ "Manufacturing",
+                                                  stri_detect_fixed(filename, "electric_power_distribution") ~ "Utilities",
+                                                  stri_detect_fixed(filename, "transportation") ~ "Transportation and warehousing",
+                                                  stri_detect_fixed(filename, "general_freight") ~ "Transportation and warehousing",
+                                                  stri_detect_fixed(filename, "railroads") ~ "Transportation and warehousing",
+                                                  stri_detect_fixed(filename, "car_dealers") ~ "Transportation and warehousing",
+                                                  stri_detect_fixed(filename, "transport") ~ "Transportation and warehousing",
+                                                  stri_detect_fixed(filename, "medical") ~ "Health care and social assistance",
+                                                  stri_detect_fixed(filename, "health") ~ "Health care and social assistance",
+                                                  stri_detect_fixed(filename, "drugs") ~ "Health care and social assistance",
+                                                  stri_detect_fixed(filename, "grocery_stores") ~ "Retail trade",
+                                                  stri_detect_fixed(filename, "grocery_and_related_products") ~ "Wholesale trade",
+                                                  TRUE ~ ""
                                                   )
                              )
 

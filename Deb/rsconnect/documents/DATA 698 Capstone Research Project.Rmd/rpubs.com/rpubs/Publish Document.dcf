@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/669650/7ae91637553740e5a2b918983f6c136c
+bundleId: https://api.rpubs.com/api/v1/document/669650/7ae91637553740e5a2b918983f6c136c
+url: http://rpubs.com/destination4debabrata/669650
+when: 1601692530.74847
