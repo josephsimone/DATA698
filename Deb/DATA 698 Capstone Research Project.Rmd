@@ -1,0 +1,96 @@
+---
+title: 'DATA 698 : Capstone Research Project'
+subtitle: Capstone Project on CPI and Employment
+author: "Debabrata Kabiraj, Joseph Simone and Rajwant Mishra"
+date: "Oct 1, 2020"
+output: 
+  rmdformats::readthedown:
+    number_sections: true # if you want number sections at each table header
+    smooth_scroll: true
+    theme: united # many options for theme, this one is my favorite.
+    highlight: tango # specifies the syntax highlighting style
+   #toc: true # table of content true
+    toc_collapsed : true
+    toc_float: true
+    toc_depth: 5
+    code_folding: hide
+    df_print: paged
+---
+
+# Overview
+
+We are in totally different era of twenty first century, and it gives us very rare situation where any positive news would help the humankind. We want to use the historical CPI data and find the relation of it with the employment, in hope that we would have some positive news on employment by following the trend of the data in past.  
+
+We feel that lower CPI would result in more job opportunity, as the it gives space for more competition in small business across sectors.   
+ 
+# Capstone Project on CPI and Employment
+
+## Data Preparation
+
+Load the required libraries
+
+```{r message=FALSE, warning=FALSE}
+#packages <- c("R.rsp","pandocfilters","knitr","plyr","tidyr","dplyr","ggplot2","plotly","sqldf","MASS","reshape2","Amelia","mice","googleVis","stringi","ROCR","scatterplot3d","visdat","gridExtra","sjmisc")
+#install.packages (packages, repos="http://cran.us.r-project.org", dependencies=TRUE, lib="C:/Program Files/R/R-3.6.3/library")
+#invisible (lapply (packages, library, character.only = T))
+#install.packages("devtools", lib="C:/Program Files/R/R-3.6.3/library")
+#devtools::install_github("hadley/ggplot2")
+
+library(tidyverse)
+library(kableExtra)
+library(lubridate)
+library(forecast)
+library(sjmisc)
+```
+
+### Load required Datasets
+
+```{r load-files, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
+file_path <- "../data/cpi/industry/clean/"
+
+read_plus <- function(flnm) {
+    read_csv(flnm) %>% 
+        mutate(filename = gsub('.{6}$', '', # remove the last 4 characters from filename (_clean)
+                               (sub(pattern = "(.*)\\..*$", replacement = "\\1", # remove extenson from filename (.csv)
+                                    basename(flnm) # get filename without the directory file path
+                                    )
+                                )
+                               )
+               )
+}
+
+tbl_with_sources <- list.files(path = file_path,
+                               pattern = "*.csv", 
+                               full.names = T) %>% 
+                      map_df(~read_plus(.))
+```
+
+```{r show-raw-data, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+DT::datatable(tbl_with_sources)
+
+print(unique(tbl_with_sources$filename))
+```
+
+### Data Cleanup
+
+```{r load_files, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+tbl_with_sources <- tbl_with_sources %>%
+                      mutate(industry = case_when(
+                                                  str_contains(filename, "mfg") ~ "Manufacturing",
+                                                  str_contains(filename, "manufacturing") ~ "Manufacturing",
+                                                  str_contains(filename, "electric_power") ~ "Utilities",
+                                                  str_contains(filename, "transportation") ~ "Transportation and warehousing",
+                                                  TRUE                      ~ NA_character_
+                                                  )
+                             )
+
+DT::datatable(tbl_with_sources)
+```
+
+## Data Exploration
+
+Now, Let's use the mutate() funtion in the dplyr package to calculate average price for the stocks
+
+### References
+
+- https://stackoverflow.com/questions/11433432/how-to-import-multiple-csv-files-at-once
