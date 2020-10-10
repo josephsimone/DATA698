@@ -72,7 +72,7 @@ print(unique(tbl_with_sources$filename))
 ```
 
 ```{r loadFiles, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
-file_path <- "../data/archive/"
+file_path <- "../data/cpi/archive/"
 
 ## Read files named *.csv
 filenames <- list.files(path=file_path,
