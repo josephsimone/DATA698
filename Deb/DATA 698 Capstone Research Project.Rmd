@@ -139,7 +139,8 @@ DT::datatable(cu_periodicity)
 DT::datatable(cu_series)
 DT::datatable(cu_period)
 
-print(unique(cu_series$series_title))
+#print(unique(cu_series$series_title))
+print(unique(cu_item$item_name))
 ```
 
 ## Data Exploration

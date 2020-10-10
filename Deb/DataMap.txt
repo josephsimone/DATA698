@@ -1,0 +1,9 @@
+CUSR0000SA0 : Series (cu.series.csv)
+
+CU : Consumer Price Index
+S : Base Code = Current (cu.base.csv)
+R : Periodicity Code = Monthly (cu.periodicity.csv)
+0000 : Area Code = U.S. city average (cu.area.csv)
+SA0 : Item Code = All items (cu.item.csv)
+
+M01 : Period = January (cu.period.csv)
