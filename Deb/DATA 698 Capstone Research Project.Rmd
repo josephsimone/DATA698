@@ -182,6 +182,7 @@ colnames(cu_reference_data)[which(names(cu_reference_data) == "selectable.y")] <
 colnames(cu_reference_data)[which(names(cu_reference_data) == "sort_sequence.y")] <- "item_sort_sequence"
 
 cu_reference_data <- cu_reference_data[c("series_id",
+                                         "series_title",
                                          "area_code",
                                          "area_name",
                                          "area_display_level",
@@ -198,13 +199,10 @@ cu_reference_data <- cu_reference_data[c("series_id",
                                          "base_code",
                                          "base_name",
                                          "base_period",
-                                         "series_title",
-                                         "footnote_codes",
                                          "begin_year",
                                          "begin_period",
                                          "end_year",
                                          "end_period")]
-
 DT::datatable(cu_reference_data)
 ```
 
@@ -214,7 +212,34 @@ DT::datatable(cu_reference_data)
 ```{r USFoodBeverage, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 cu_data_11_USFoodBeverage = cu_data_11_USFoodBeverage %>% 
                               inner_join(cu_reference_data, by="series_id") %>% 
-                              inner_join(cu_period, by="period")
+                              inner_join(cu_period, by="period") %>% 
+                               select(c("series_id",
+                                        "series_title",
+                                        "year",
+                                        "period",
+                                        "period_abbr",
+                                        "period_name",
+                                        "value",
+                                        "area_code",
+                                        "area_name",
+                                        "area_display_level",
+                                        "area_selectable",
+                                        "area_sort_sequence",
+                                        "item_code",
+                                        "item_name",
+                                        "item_display_level",
+                                        "item_selectable",
+                                        "item_sort_sequence",
+                                        "seasonal",
+                                        "periodicity_code",
+                                        "periodicity_name",
+                                        "base_code",
+                                        "base_name",
+                                        "base_period",
+                                        "begin_year",
+                                        "begin_period",
+                                        "end_year",
+                                        "end_period"))
 DT::datatable(head(cu_data_11_USFoodBeverage))
 ```
 
@@ -222,7 +247,34 @@ DT::datatable(head(cu_data_11_USFoodBeverage))
 ```{r USHousing, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 cu_data_12_USHousing = cu_data_12_USHousing %>% 
                         inner_join(cu_reference_data, by="series_id") %>% 
-                        inner_join(cu_period, by="period")
+                        inner_join(cu_period, by="period") %>% 
+                         select(c("series_id",
+                                  "series_title",
+                                  "year",
+                                  "period",
+                                  "period_abbr",
+                                  "period_name",
+                                  "value",
+                                  "area_code",
+                                  "area_name",
+                                  "area_display_level",
+                                  "area_selectable",
+                                  "area_sort_sequence",
+                                  "item_code",
+                                  "item_name",
+                                  "item_display_level",
+                                  "item_selectable",
+                                  "item_sort_sequence",
+                                  "seasonal",
+                                  "periodicity_code",
+                                  "periodicity_name",
+                                  "base_code",
+                                  "base_name",
+                                  "base_period",
+                                  "begin_year",
+                                  "begin_period",
+                                  "end_year",
+                                  "end_period"))
 DT::datatable(head(cu_data_12_USHousing))
 ```
 
@@ -230,7 +282,34 @@ DT::datatable(head(cu_data_12_USHousing))
 ```{r USTransportation, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 cu_data_14_USTransportation = cu_data_14_USTransportation %>% 
                                inner_join(cu_reference_data, by="series_id") %>% 
-                               inner_join(cu_period, by="period")
+                               inner_join(cu_period, by="period") %>% 
+                                select(c("series_id",
+                                         "series_title",
+                                         "year",
+                                         "period",
+                                         "period_abbr",
+                                         "period_name",
+                                         "value",
+                                         "area_code",
+                                         "area_name",
+                                         "area_display_level",
+                                         "area_selectable",
+                                         "area_sort_sequence",
+                                         "item_code",
+                                         "item_name",
+                                         "item_display_level",
+                                         "item_selectable",
+                                         "item_sort_sequence",
+                                         "seasonal",
+                                         "periodicity_code",
+                                         "periodicity_name",
+                                         "base_code",
+                                         "base_name",
+                                         "base_period",
+                                         "begin_year",
+                                         "begin_period",
+                                         "end_year",
+                                         "end_period"))
 DT::datatable(head(cu_data_14_USTransportation))
 ```
 
@@ -238,7 +317,34 @@ DT::datatable(head(cu_data_14_USTransportation))
 ```{r USMedical, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 cu_data_15_USMedical = cu_data_15_USMedical %>% 
                         inner_join(cu_reference_data, by="series_id") %>% 
-                        inner_join(cu_period, by="period")
+                        inner_join(cu_period, by="period") %>% 
+                         select(c("series_id",
+                                  "series_title",
+                                  "year",
+                                  "period",
+                                  "period_abbr",
+                                  "period_name",
+                                  "value",
+                                  "area_code",
+                                  "area_name",
+                                  "area_display_level",
+                                  "area_selectable",
+                                  "area_sort_sequence",
+                                  "item_code",
+                                  "item_name",
+                                  "item_display_level",
+                                  "item_selectable",
+                                  "item_sort_sequence",
+                                  "seasonal",
+                                  "periodicity_code",
+                                  "periodicity_name",
+                                  "base_code",
+                                  "base_name",
+                                  "base_period",
+                                  "begin_year",
+                                  "begin_period",
+                                  "end_year",
+                                  "end_period"))
 DT::datatable(head(cu_data_15_USMedical))
 ```
 
@@ -246,7 +352,34 @@ DT::datatable(head(cu_data_15_USMedical))
 ```{r USEducationAndCommunication, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 cu_data_17_USEducationAndCommunication = cu_data_17_USEducationAndCommunication %>% 
                                           inner_join(cu_reference_data, by="series_id") %>% 
-                                          inner_join(cu_period, by="period")
+                                          inner_join(cu_period, by="period") %>% 
+                                           select(c("series_id",
+                                                    "series_title",
+                                                    "year",
+                                                    "period",
+                                                    "period_abbr",
+                                                    "period_name",
+                                                    "value",
+                                                    "area_code",
+                                                    "area_name",
+                                                    "area_display_level",
+                                                    "area_selectable",
+                                                    "area_sort_sequence",
+                                                    "item_code",
+                                                    "item_name",
+                                                    "item_display_level",
+                                                    "item_selectable",
+                                                    "item_sort_sequence",
+                                                    "seasonal",
+                                                    "periodicity_code",
+                                                    "periodicity_name",
+                                                    "base_code",
+                                                    "base_name",
+                                                    "base_period",
+                                                    "begin_year",
+                                                    "begin_period",
+                                                    "end_year",
+                                                    "end_period"))
 DT::datatable(head(cu_data_17_USEducationAndCommunication))
 ```
 
