@@ -112,7 +112,7 @@ DT::datatable(EMP_DAT_CAT_SAN)
 EMP_DAT_CAT_SAN %>% filter(GeoName=="New York")
 ```
 
-### Load required CPI Datasets
+### Load CPI Data
 
 ```{r load-cpi-files, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
 file_path <- "../data/cpi/industry/clean/"
@@ -265,9 +265,9 @@ cu_reference_data <- cu_reference_data[c("series_id",
 DT::datatable(cu_reference_data)
 ```
 
-## Load CPI Data from Select Sectors
+### Show CPI Data from Select Sectors
 
-### CPI - US Food Beverages
+#### CPI - US Food Beverages
 ```{r USFoodBeverage, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 cu_data_11_USFoodBeverage = cu_data_11_USFoodBeverage %>% 
                               inner_join(cu_reference_data, by="series_id") %>% 
@@ -299,7 +299,7 @@ cu_data_11_USFoodBeverage = cu_data_11_USFoodBeverage %>%
 DT::datatable((cu_data_11_USFoodBeverage))
 ```
 
-### CPI - US Housing
+#### CPI - US Housing
 ```{r USHousing, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 cu_data_12_USHousing = cu_data_12_USHousing %>% 
                         inner_join(cu_reference_data, by="series_id") %>% 
@@ -331,7 +331,7 @@ cu_data_12_USHousing = cu_data_12_USHousing %>%
 DT::datatable((cu_data_12_USHousing))
 ```
 
-### CPI - US Transportation
+#### CPI - US Transportation
 ```{r USTransportation, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 cu_data_14_USTransportation = cu_data_14_USTransportation %>% 
                                inner_join(cu_reference_data, by="series_id") %>% 
@@ -363,7 +363,7 @@ cu_data_14_USTransportation = cu_data_14_USTransportation %>%
 DT::datatable((cu_data_14_USTransportation))
 ```
 
-### CPI - US Medical
+#### CPI - US Medical
 ```{r USMedical, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 cu_data_15_USMedical = cu_data_15_USMedical %>% 
                         inner_join(cu_reference_data, by="series_id") %>% 
@@ -395,7 +395,7 @@ cu_data_15_USMedical = cu_data_15_USMedical %>%
 DT::datatable((cu_data_15_USMedical))
 ```
 
-### CPI - US Education And Communication
+#### CPI - US Education And Communication
 ```{r USEducationAndCommunication, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 cu_data_17_USEducationAndCommunication = cu_data_17_USEducationAndCommunication %>% 
                                           inner_join(cu_reference_data, by="series_id") %>% 
