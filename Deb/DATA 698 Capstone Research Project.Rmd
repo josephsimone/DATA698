@@ -268,7 +268,42 @@ DT::datatable(cu_reference_data)
 ## Show CPI Data from Select Sectors
 
 ### CPI - US Food Beverages
-```{r USFoodBeverage, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+```{r USFoodBeverage, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+FoodItemCode <- cu_reference_data %>%
+                    filter(grepl('SAF|SEF|SS07', item_code))
+                    #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
+#DT::datatable((HousingItemCode))
+
+cu_data_USFoodBeverage = cu_data_0_Current %>% 
+                              inner_join(FoodItemCode, by="series_id") %>% 
+                              inner_join(cu_period, by="period") %>% 
+                               filter(year %in% (1998:2018)) %>% 
+                               select(c("series_id",
+                                        "series_title",
+                                        "year",
+                                        "period",
+                                        "period_abbr",
+                                        "period_name",
+                                        "value",
+                                        "area_code",
+                                        "area_name",
+                                        "area_display_level",
+                                        "area_selectable",
+                                        "area_sort_sequence",
+                                        "item_code",
+                                        "item_name",
+                                        "item_display_level",
+                                        "item_selectable",
+                                        "item_sort_sequence",
+                                        "seasonal",
+                                        "periodicity_code",
+                                        "periodicity_name",
+                                        "base_code",
+                                        "base_name",
+                                        "base_period"))
+DT::datatable(head(cu_data_USFoodBeverage))
+```
+```{r 11USFoodBeverage, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
 cu_data_11_USFoodBeverage = cu_data_11_USFoodBeverage %>% 
                               inner_join(cu_reference_data, by="series_id") %>% 
                               inner_join(cu_period, by="period") %>% 
@@ -300,7 +335,44 @@ DT::datatable((cu_data_11_USFoodBeverage))
 ```
 
 ### CPI - US Housing
-```{r USHousing, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+```{r USHousing, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+HousingItemCode <- cu_reference_data %>%
+                    #filter(grepl('SAH|SEH', item_code, fixed = TRUE))
+                    filter(grepl('SAH|SEH', item_code))
+                    #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
+#DT::datatable((HousingItemCode))
+
+cu_data_USHousing = cu_data_0_Current %>% 
+                              inner_join(HousingItemCode, by="series_id") %>% 
+                              inner_join(cu_period, by="period") %>% 
+                               #filter(item_code %like% c('SAH','SEH')) %>%
+                               filter(year %in% (1998:2018)) %>% 
+                               select(c("series_id",
+                                        "series_title",
+                                        "year",
+                                        "period",
+                                        "period_abbr",
+                                        "period_name",
+                                        "value",
+                                        "area_code",
+                                        "area_name",
+                                        "area_display_level",
+                                        "area_selectable",
+                                        "area_sort_sequence",
+                                        "item_code",
+                                        "item_name",
+                                        "item_display_level",
+                                        "item_selectable",
+                                        "item_sort_sequence",
+                                        "seasonal",
+                                        "periodicity_code",
+                                        "periodicity_name",
+                                        "base_code",
+                                        "base_name",
+                                        "base_period"))
+DT::datatable(head(cu_data_USHousing))
+```
+```{r 12USHousing, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
 cu_data_12_USHousing = cu_data_12_USHousing %>% 
                         inner_join(cu_reference_data, by="series_id") %>% 
                         inner_join(cu_period, by="period") %>% 
@@ -332,7 +404,42 @@ DT::datatable((cu_data_12_USHousing))
 ```
 
 ### CPI - US Transportation
-```{r USTransportation, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+```{r USTransportation, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+TransportItemCode <- cu_reference_data %>%
+                    filter(grepl('SAS24|SAS4|SAT|SETG|SS53', item_code))
+                    #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
+#DT::datatable((HousingItemCode))
+
+cu_data_USTransportation = cu_data_0_Current %>% 
+                              inner_join(TransportItemCode, by="series_id") %>% 
+                              inner_join(cu_period, by="period") %>% 
+                               filter(year %in% (1998:2018)) %>% 
+                               select(c("series_id",
+                                        "series_title",
+                                        "year",
+                                        "period",
+                                        "period_abbr",
+                                        "period_name",
+                                        "value",
+                                        "area_code",
+                                        "area_name",
+                                        "area_display_level",
+                                        "area_selectable",
+                                        "area_sort_sequence",
+                                        "item_code",
+                                        "item_name",
+                                        "item_display_level",
+                                        "item_selectable",
+                                        "item_sort_sequence",
+                                        "seasonal",
+                                        "periodicity_code",
+                                        "periodicity_name",
+                                        "base_code",
+                                        "base_name",
+                                        "base_period"))
+DT::datatable(head(cu_data_USTransportation))
+```
+```{r 14USTransportation, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
 cu_data_14_USTransportation = cu_data_14_USTransportation %>% 
                                inner_join(cu_reference_data, by="series_id") %>% 
                                inner_join(cu_period, by="period") %>% 
@@ -364,7 +471,42 @@ DT::datatable((cu_data_14_USTransportation))
 ```
 
 ### CPI - US Medical
-```{r USMedical, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+```{r USMedical, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+MedicalItemCode <- cu_reference_data %>%
+                    filter(grepl('SAM|SEM', item_code))
+                    #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
+#DT::datatable((HousingItemCode))
+
+cu_data_USMedical = cu_data_0_Current %>% 
+                              inner_join(MedicalItemCode, by="series_id") %>% 
+                              inner_join(cu_period, by="period") %>% 
+                               filter(year %in% (1998:2018)) %>% 
+                               select(c("series_id",
+                                        "series_title",
+                                        "year",
+                                        "period",
+                                        "period_abbr",
+                                        "period_name",
+                                        "value",
+                                        "area_code",
+                                        "area_name",
+                                        "area_display_level",
+                                        "area_selectable",
+                                        "area_sort_sequence",
+                                        "item_code",
+                                        "item_name",
+                                        "item_display_level",
+                                        "item_selectable",
+                                        "item_sort_sequence",
+                                        "seasonal",
+                                        "periodicity_code",
+                                        "periodicity_name",
+                                        "base_code",
+                                        "base_name",
+                                        "base_period"))
+DT::datatable(head(cu_data_USMedical))
+```
+```{r 15USMedical, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
 cu_data_15_USMedical = cu_data_15_USMedical %>% 
                         inner_join(cu_reference_data, by="series_id") %>% 
                         inner_join(cu_period, by="period") %>% 
@@ -396,7 +538,42 @@ DT::datatable((cu_data_15_USMedical))
 ```
 
 ### CPI - US Education And Communication
-```{r USEducationAndCommunication, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+```{r USEducationAndCommunication, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+EducationItemCode <- cu_reference_data %>%
+                    filter(grepl('SAE|SEEA|SEEB', item_code))
+                    #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
+#DT::datatable((HousingItemCode))
+
+cu_data_USEducationAndCommunication = cu_data_0_Current %>% 
+                              inner_join(EducationItemCode, by="series_id") %>% 
+                              inner_join(cu_period, by="period") %>% 
+                               filter(year %in% (1998:2018)) %>% 
+                               select(c("series_id",
+                                        "series_title",
+                                        "year",
+                                        "period",
+                                        "period_abbr",
+                                        "period_name",
+                                        "value",
+                                        "area_code",
+                                        "area_name",
+                                        "area_display_level",
+                                        "area_selectable",
+                                        "area_sort_sequence",
+                                        "item_code",
+                                        "item_name",
+                                        "item_display_level",
+                                        "item_selectable",
+                                        "item_sort_sequence",
+                                        "seasonal",
+                                        "periodicity_code",
+                                        "periodicity_name",
+                                        "base_code",
+                                        "base_name",
+                                        "base_period"))
+DT::datatable(head(cu_data_USEducationAndCommunication))
+```
+```{r 17USEducationAndCommunication, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
 cu_data_17_USEducationAndCommunication = cu_data_17_USEducationAndCommunication %>% 
                                           inner_join(cu_reference_data, by="series_id") %>% 
                                           inner_join(cu_period, by="period") %>% 
