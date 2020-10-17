@@ -1,0 +1,5 @@
+CU-U-R-0000-AA0 = <series_id>
+CU-<seasonal>-<periodicity_code>-<area_code>-<item_code>
+
+S-A0L1E = <item_code>
+<base_code>-<>

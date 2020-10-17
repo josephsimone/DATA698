@@ -41,6 +41,7 @@ library(kableExtra)
 library(lubridate)
 library(forecast)
 library(stringi)
+library(dplyr)
 ```
 
 ### Load required Datasets
@@ -104,7 +105,6 @@ for(i in filenames){
    assign(x=name, value=data.frame(read.csv(i)))
    #DT::datatable(name)
 }
-
 ```
 
 ### Reference Data
@@ -131,21 +131,124 @@ tbl_with_sources <- tbl_with_sources %>%
 DT::datatable(tbl_with_sources)
 ```
 
-```{r show_sources, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+#### Area
+```{r show_area, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 DT::datatable(cu_area)
-DT::datatable(cu_base)
-DT::datatable(cu_item)
-DT::datatable(cu_periodicity)
-DT::datatable(cu_series)
-DT::datatable(cu_period)
+```
 
+#### Base
+```{r show_base, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+DT::datatable(cu_base)
+```
+
+#### Item
+```{r show_item, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+DT::datatable(cu_item)
+```
+
+#### Periodicity
+```{r show_periodicity, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+DT::datatable(cu_periodicity)
+```
+
+#### Series
+```{r show_series, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+DT::datatable(cu_series)
+```
+
+#### Period
+```{r show_period, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+DT::datatable(cu_period)
+```
+
+```{r show_unique_items, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 #print(unique(cu_series$series_title))
 print(unique(cu_item$item_name))
 ```
 
+### Combined Reference Data
+```{r show_references, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+cu_reference_data = cu_series %>% 
+                    inner_join(cu_area, by="area_code") %>% 
+                    inner_join(cu_item, by="item_code") %>% 
+                    inner_join(cu_periodicity, by="periodicity_code") %>% 
+                    inner_join(cu_base, by="base_code")
+
+colnames(cu_reference_data)[which(names(cu_reference_data) == "display_level.x")] <- "area_display_level"
+colnames(cu_reference_data)[which(names(cu_reference_data) == "selectable.x")] <- "area_selectable"
+colnames(cu_reference_data)[which(names(cu_reference_data) == "sort_sequence.x")] <- "area_sort_sequence"
+colnames(cu_reference_data)[which(names(cu_reference_data) == "display_level.y")] <- "item_display_level"
+colnames(cu_reference_data)[which(names(cu_reference_data) == "selectable.y")] <- "item_selectable"
+colnames(cu_reference_data)[which(names(cu_reference_data) == "sort_sequence.y")] <- "item_sort_sequence"
+
+cu_reference_data <- cu_reference_data[c("series_id",
+                                         "area_code",
+                                         "area_name",
+                                         "area_display_level",
+                                         "area_selectable",
+                                         "area_sort_sequence",
+                                         "item_code",
+                                         "item_name",
+                                         "item_display_level",
+                                         "item_selectable",
+                                         "item_sort_sequence",
+                                         "seasonal",
+                                         "periodicity_code",
+                                         "periodicity_name",
+                                         "base_code",
+                                         "base_name",
+                                         "base_period",
+                                         "series_title",
+                                         "footnote_codes",
+                                         "begin_year",
+                                         "begin_period",
+                                         "end_year",
+                                         "end_period")]
+
+DT::datatable(cu_reference_data)
+```
+
 ## Data Exploration
 
-Now, Let's use the mutate() funtion in the dplyr package to calculate cpi
+### CPI - US Food Beverages
+```{r USFoodBeverage, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+cu_data_11_USFoodBeverage = cu_data_11_USFoodBeverage %>% 
+                              inner_join(cu_reference_data, by="series_id") %>% 
+                              inner_join(cu_period, by="period")
+DT::datatable(head(cu_data_11_USFoodBeverage))
+```
+
+### CPI - US Housing
+```{r USHousing, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+cu_data_12_USHousing = cu_data_12_USHousing %>% 
+                        inner_join(cu_reference_data, by="series_id") %>% 
+                        inner_join(cu_period, by="period")
+DT::datatable(head(cu_data_12_USHousing))
+```
+
+### CPI - US Transportation
+```{r USTransportation, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+cu_data_14_USTransportation = cu_data_14_USTransportation %>% 
+                               inner_join(cu_reference_data, by="series_id") %>% 
+                               inner_join(cu_period, by="period")
+DT::datatable(head(cu_data_14_USTransportation))
+```
+
+### CPI - US Medical
+```{r USMedical, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+cu_data_15_USMedical = cu_data_15_USMedical %>% 
+                        inner_join(cu_reference_data, by="series_id") %>% 
+                        inner_join(cu_period, by="period")
+DT::datatable(head(cu_data_15_USMedical))
+```
+
+### CPI - US Education And Communication
+```{r USEducationAndCommunication, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+cu_data_17_USEducationAndCommunication = cu_data_17_USEducationAndCommunication %>% 
+                                          inner_join(cu_reference_data, by="series_id") %>% 
+                                          inner_join(cu_period, by="period")
+DT::datatable(head(cu_data_17_USEducationAndCommunication))
+```
 
 ### References
 
