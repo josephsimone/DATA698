@@ -28,10 +28,11 @@ We feel that lower CPI would result in more job opportunity, as the it gives spa
 1. The estimates of employment for 1998-2006 are based on the 2002 North American Industry Classification System (NAICS). The estimates for 2007-2010 are based on the 2007 NAICS. The estimates for 2011-2016 are based on the 2012 NAICS. The estimates for 2017 forward are based on the 2017 NAICS.
 2. Excludes limited partners.
 3. Under the 2007 NAICS, internet publishing and broadcasting was reclassified to other information services.
-(D) Not shown to avoid disclosure of confidential information; estimates are included in higher-level totals.
-(T) Estimate for employment suppressed to cover corresponding estimate for earnings. Estimates for this item are included in the total.
-(NA) Not available.
-(NM) Not meaningful.
+
+- (D) Not shown to avoid disclosure of confidential information; estimates are included in higher-level totals.
+- (T) Estimate for employment suppressed to cover corresponding estimate for earnings. Estimates for this item are included in the total.
+- (NA) Not available.
+- (NM) Not meaningful.
 
 Last updated: September 24, 2019- new statistics for 2018; revised statistics for 2014-2017.
 
@@ -64,7 +65,7 @@ EMP_DATA <- read_delim(EMP_DATA_FILE, delim = ",", col_names = TRUE, trim_ws= TR
 #,skip = 6,col_types = list(col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character()))
 # names(SAP_INV_DAT) = c("DROP","I_BILLDATE","I_ORG","I_DC","I_DOCCA","I_BILLTYPE","I_ORDER_REA","I_DIV","I_MATYPE","I_BILL_QTY","BLANK")
 # SAP_INV_DAT<- SAP_INV_DAT[-which(is.na(SAP_INV_DAT$I_ORG)),] %>% .[-str_which(trimws(.$I_ORG),'SOrg.|-----'),c(-1,-11)]
-# 
+# 3
 # SAP_INV_DAT$I_BILLDATE <- date(parse_datetime(SAP_INV_DAT$I_BILLDATE, "%m/%d/%Y"))
 # 
 # head(SAP_INV_DAT)
@@ -72,7 +73,7 @@ EMP_DATA <- read_delim(EMP_DATA_FILE, delim = ",", col_names = TRUE, trim_ws= TR
 
 ### Show Relevant Employment Data
 
-```{r emp-data, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
+```{r emp-data, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
 summary(EMP_DATA)
 
 # MN-MAIN  | NN - RANGE  | NL - LAST |
@@ -92,15 +93,16 @@ glimpse(EMP_DAT_CAT)
 head(EMP_DAT_CAT,130)
 
 # Reading the Category and detail Desc for ref.
-IND_DESC <- XML::xmlToDataFrame("SAEMP25N__definition.xml")
+EMP_DEF_FILE <- paste0(file_path,"SAEMP25N__definition.xml")
+IND_DESC <- XML::xmlToDataFrame(EMP_DEF_FILE)
 names(IND_DESC) <- c("LineCode","Description")
 glimpse(IND_DESC)
 head(IND_DESC,5)
 
 temp_name <- names(EMP_DAT_CAT [,c(4:24)])
 EMP_DAT_CAT_SAN <-  data.frame(lapply(EMP_DAT_CAT [,c(4:24)],function(x) {
-                 gsub("(D)|(T)",NA,x)
-              })) 
+                      gsub("(D)|(T)",NA,x)
+                    })) 
 
 names(EMP_DAT_CAT_SAN) = temp_name
 
@@ -125,14 +127,11 @@ read_plus <- function(flnm) {
                                )
                )
 }
-
 tbl_with_sources <- list.files(path = file_path,
                                pattern = "*.csv", 
                                full.names = T) %>% 
                       map_df(~read_plus(.))
-
 DT::datatable(tbl_with_sources)
-
 print(unique(tbl_with_sources$filename))
 ```
 
