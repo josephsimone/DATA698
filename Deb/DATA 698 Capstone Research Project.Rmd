@@ -89,25 +89,25 @@ EMAP_CAT_LAST <- EMP_DATA[,c(2,5,6,7)] %>%
                   mutate(ISM = ifelse(IndustryClassification=="...","M","N")) %>% 
                   separate(IndustryClassification, c("From", "To"))  %>% 
                   mutate(ISML = ifelse(is.na(To)==T,"L","N")) %>% 
-                  filter(ISML=="L") %>%  
+                  filter(ISML %in% c("L","N")) %>%  
                   select(.,LineCode,Description)
-DT::datatable(EMAP_CAT_LAST)
+#DT::datatable(EMAP_CAT_LAST)
 
 EMP_DAT_CAT <- EMP_DATA[,c(2,5,9:29)] %>% 
                 left_join(EMAP_CAT_LAST,.,by="LineCode")
 glimpse(EMP_DAT_CAT)
 head(EMP_DAT_CAT,130)
-DT::datatable(EMP_DAT_CAT)
+#DT::datatable(EMP_DAT_CAT)
 
 temp_name <- names(EMP_DAT_CAT [,c(4:24)])
 EMP_DAT_CAT_SAN <-  data.frame(lapply(EMP_DAT_CAT [,c(4:24)],function(x) {
                       gsub("(D)|(T)",NA,x)
                     })) 
 names(EMP_DAT_CAT_SAN) = temp_name
-DT::datatable(EMP_DAT_CAT_SAN)
+#DT::datatable(EMP_DAT_CAT_SAN)
 
 EMP_DAT_CAT_SAN <- cbind(EMP_DAT_CAT[,c(1:3)],EMP_DAT_CAT_SAN)
-DT::datatable(EMP_DAT_CAT_SAN)
+#DT::datatable(EMP_DAT_CAT_SAN)
 ```
 
 ### Employment in New York from Select Industry
@@ -281,7 +281,7 @@ DT::datatable(cu_reference_data)
 FoodItemCode <- cu_reference_data %>%
                     filter(grepl('SAF|SEF|SS0|SS1|SS20', item_code))
                     #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
-DT::datatable((FoodItemCode))
+#DT::datatable((FoodItemCode))
 
 cu_data_USFoodBeverage = cu_data_0_Current %>% 
                               inner_join(FoodItemCode, by="series_id") %>% 
@@ -349,7 +349,7 @@ HousingItemCode <- cu_reference_data %>%
                     #filter(grepl('SAH|SEH', item_code, fixed = TRUE))
                     filter(grepl('SAH|SEH', item_code))
                     #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
-DT::datatable((HousingItemCode))
+#DT::datatable((HousingItemCode))
 
 cu_data_USHousing = cu_data_0_Current %>% 
                               inner_join(HousingItemCode, by="series_id") %>% 
@@ -417,7 +417,7 @@ DT::datatable((cu_data_12_USHousing))
 TransportItemCode <- cu_reference_data %>%
                     filter(grepl('SAT|SET|SS4|SS52|SS53|SAS24|SAS4', item_code))
                     #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
-DT::datatable((TransportItemCode))
+#DT::datatable((TransportItemCode))
 
 cu_data_USTransportation = cu_data_0_Current %>% 
                               inner_join(TransportItemCode, by="series_id") %>% 
@@ -484,7 +484,7 @@ DT::datatable((cu_data_14_USTransportation))
 MedicalItemCode <- cu_reference_data %>%
                     filter(grepl('SAM|SEM|SS57', item_code))
                     #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
-DT::datatable((MedicalItemCode))
+#DT::datatable((MedicalItemCode))
 
 cu_data_USMedical = cu_data_0_Current %>% 
                               inner_join(MedicalItemCode, by="series_id") %>% 
@@ -551,7 +551,7 @@ DT::datatable((cu_data_15_USMedical))
 EducationItemCode <- cu_reference_data %>%
                     filter(grepl('SAE|SEE|SSE|SS27', item_code))
                     #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
-DT::datatable((EducationItemCode))
+#DT::datatable((EducationItemCode))
 
 cu_data_USEducationAndCommunication = cu_data_0_Current %>% 
                                         inner_join(EducationItemCode, by="series_id") %>% 
@@ -619,8 +619,10 @@ DT::datatable((cu_data_17_USEducationAndCommunication))
 
 ```{r CpiEmpFoodBeverage, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cu_emp_data_USFoodBeverage_NY = cu_data_USFoodBeverage %>% 
-                                  filter(area_name=="New York-Northern New Jersey-Long Island") %>% 
-                                  mutate(parent_item_code = 'SAF', emp_line_code = 705) %>% 
+                                  filter(area_name=="New York-Northern New Jersey-Long Island", 
+                                         period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
+                                  mutate(parent_item_code = 'SAF', 
+                                         emp_line_code = 705) %>% 
                                    select(c("parent_item_code",
                                             "emp_line_code",
                                             "series_id",
@@ -645,7 +647,9 @@ cu_emp_data_USFoodBeverage_NY = cu_data_USFoodBeverage %>%
                                             "periodicity_name",
                                             "base_code",
                                             "base_name",
-                                            "base_period"))
+                                            "base_period")) %>% 
+                                  group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                                  summarise(cpi_value = sum(value))
 #cu_emp_data_USFoodBeverage_NY %>%
 #  sample_frac(0.33) %>% 
 #  DT::datatable()
@@ -659,15 +663,17 @@ cpi_emp_data_USFoodBeverage_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USFoodBev
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
 
 cpi_emp_data_USFoodBeverage_NY %>%
-  sample_frac(0.33) %>% 
+#  sample_frac(0.33) %>% 
   DT::datatable()
 ```
 
 ## Housing
 ```{r CpiEmpHousing, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cu_emp_data_USHousing_NY = cu_data_USHousing  %>% 
-                            filter(area_name=="New York-Northern New Jersey-Long Island") %>% 
-                            mutate(parent_item_code = 'SAH', emp_line_code = 1100) %>% 
+                            filter(area_name=="New York-Northern New Jersey-Long Island", 
+                                   period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
+                            mutate(parent_item_code = 'SAH', 
+                                   emp_line_code = 1100) %>% 
                             select(c("parent_item_code",
                                      "emp_line_code",
                                      "series_id",
@@ -692,7 +698,9 @@ cu_emp_data_USHousing_NY = cu_data_USHousing  %>%
                                      "periodicity_name",
                                      "base_code",
                                      "base_name",
-                                     "base_period"))
+                                     "base_period")) %>% 
+                            group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                            summarise(cpi_value = sum(value))
 #cu_emp_data_USHousing_NY %>%
 #  sample_frac(0.33) %>% 
 #  DT::datatable()
@@ -706,15 +714,17 @@ cpi_emp_data_USHousing_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USHousing_NY,
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
 
 cpi_emp_data_USHousing_NY %>%
-  sample_frac(0.33) %>% 
+#  sample_frac(0.33) %>% 
   DT::datatable()
 ```
 
 ## Transportation
 ```{r CpiEmpTransportation, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cu_emp_data_USTransportation_NY = cu_data_USTransportation %>% 
-                                    filter(area_name=="New York-Northern New Jersey-Long Island") %>% 
-                                    mutate(parent_item_code = 'SAT', emp_line_code = 800) %>% 
+                                    filter(area_name=="New York-Northern New Jersey-Long Island", 
+                                           period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
+                                    mutate(parent_item_code = 'SAT', 
+                                           emp_line_code = 800) %>% 
                                     select(c("parent_item_code",
                                              "emp_line_code",
                                              "series_id",
@@ -739,10 +749,12 @@ cu_emp_data_USTransportation_NY = cu_data_USTransportation %>%
                                              "periodicity_name",
                                              "base_code",
                                              "base_name",
-                                             "base_period"))
-cu_emp_data_USTransportation_NY %>%
-  sample_frac(0.33) %>% 
-  DT::datatable()
+                                             "base_period")) %>% 
+                                    group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                                    summarise(cpi_value = sum(value))
+#cu_emp_data_USTransportation_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
 
 #Transportation and warehousing
 #EMP_DAT_CAT_SAN_USTransportation_NY = EMP_DAT_CAT_SAN_NY %>%
@@ -753,15 +765,17 @@ cpi_emp_data_USTransportation_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USTrans
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
 
 cpi_emp_data_USTransportation_NY %>%
-  sample_frac(0.33) %>% 
+#  sample_frac(0.33) %>% 
   DT::datatable()
 ```
 
 ## Medical
 ```{r CpiEmpMedical, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cu_emp_data_USMedical_NY = cu_data_USMedical %>% 
-                            filter(area_name=="New York-Northern New Jersey-Long Island") %>% 
-                            mutate(parent_item_code = 'SAM', emp_line_code = 1600) %>% 
+                            filter(area_name=="New York-Northern New Jersey-Long Island", 
+                                   period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
+                            mutate(parent_item_code = 'SAM', 
+                                   emp_line_code = 1600) %>% 
                             select(c("parent_item_code",
                                      "emp_line_code",
                                      "series_id",
@@ -786,7 +800,9 @@ cu_emp_data_USMedical_NY = cu_data_USMedical %>%
                                      "periodicity_name",
                                      "base_code",
                                      "base_name",
-                                     "base_period"))
+                                     "base_period")) %>% 
+                            group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                            summarise(cpi_value = sum(value))
 #cu_emp_data_USMedical_NY %>%
 #  sample_frac(0.33) %>% 
 #  DT::datatable()
@@ -800,14 +816,15 @@ cpi_emp_data_USMedical_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USMedical_NY,
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
 
 cpi_emp_data_USMedical_NY %>%
-  sample_frac(0.33) %>% 
+#  sample_frac(0.33) %>% 
   DT::datatable()
 ```
 
 ## Education & Communication
 ```{r CpiEmpEduComm, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cu_data_USEducationAndCommunication_NY = cu_data_USEducationAndCommunication %>% 
-                                          filter(area_name=="New York-Northern New Jersey-Long Island") %>% 
+                                          filter(area_name=="New York-Northern New Jersey-Long Island", 
+                                                 period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
                                           mutate(parent_item_code = 'SAE', emp_line_code = 1500) %>% 
                                           select(c("parent_item_code",
                                                    "emp_line_code",
@@ -833,7 +850,9 @@ cu_data_USEducationAndCommunication_NY = cu_data_USEducationAndCommunication %>%
                                                    "periodicity_name",
                                                    "base_code",
                                                    "base_name",
-                                                   "base_period"))
+                                                   "base_period")) %>% 
+                                          group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                                          summarise(cpi_value = sum(value))
 #cu_data_USEducationAndCommunication_NY %>%
 #  sample_frac(0.33) %>% 
 #  DT::datatable()
@@ -847,7 +866,7 @@ cpi_emp_data_USEducationAndCommunication_NY = merge(EMP_DAT_CAT_SAN_NY, cu_data_
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
 
 cpi_emp_data_USEducationAndCommunication_NY %>%
-  sample_frac(0.33) %>% 
+#  sample_frac(0.33) %>% 
   DT::datatable()
 ```
 
