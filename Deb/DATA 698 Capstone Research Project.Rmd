@@ -29,10 +29,10 @@ We feel that lower CPI would result in more job opportunity, as the it gives spa
 2. Excludes limited partners.
 3. Under the 2007 NAICS, internet publishing and broadcasting was reclassified to other information services.
 
-- (D) Not shown to avoid disclosure of confidential information; estimates are included in higher-level totals.
-- (T) Estimate for employment suppressed to cover corresponding estimate for earnings. Estimates for this item are included in the total.
 - (NA) Not available.
 - (NM) Not meaningful.
+- (D) Not shown to avoid disclosure of confidential information; estimates are included in higher-level totals.
+- (T) Estimate for employment suppressed to cover corresponding estimate for earnings. Estimates for this item are included in the total.
 
 Last updated: September 24, 2019- new statistics for 2018; revised statistics for 2014-2017.
 
@@ -69,13 +69,20 @@ EMP_DATA <- read_delim(EMP_DATA_FILE, delim = ",", col_names = TRUE, trim_ws= TR
 # SAP_INV_DAT$I_BILLDATE <- date(parse_datetime(SAP_INV_DAT$I_BILLDATE, "%m/%d/%Y"))
 # 
 # head(SAP_INV_DAT)
+summary(EMP_DATA)
+DT::datatable(EMP_DATA)
+
+# Reading the Category and detail Desc for ref.
+EMP_DEF_FILE <- paste0(file_path,"SAEMP25N__definition.xml")
+IND_DESC <- XML::xmlToDataFrame(EMP_DEF_FILE)
+names(IND_DESC) <- c("LineCode","Description")
+glimpse(IND_DESC)
+head(IND_DESC,5)
 ```
 
 ## Show Relevant Employment Data
 
-```{r emp-data, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE, results='show'}
-summary(EMP_DATA)
-
+```{r emp-data, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 # MN-MAIN  | NN - RANGE  | NL - LAST |
 EMAP_CAT_LAST <- EMP_DATA[,c(2,5,6,7)] %>% 
                   filter(GeoName=="United States") %>% 
@@ -84,32 +91,39 @@ EMAP_CAT_LAST <- EMP_DATA[,c(2,5,6,7)] %>%
                   mutate(ISML = ifelse(is.na(To)==T,"L","N")) %>% 
                   filter(ISML=="L") %>%  
                   select(.,LineCode,Description)
+DT::datatable(EMAP_CAT_LAST)
 
 EMP_DAT_CAT <- EMP_DATA[,c(2,5,9:29)] %>% 
                 left_join(EMAP_CAT_LAST,.,by="LineCode")
-
-# Reading the Employment Data
 glimpse(EMP_DAT_CAT)
 head(EMP_DAT_CAT,130)
-
-# Reading the Category and detail Desc for ref.
-EMP_DEF_FILE <- paste0(file_path,"SAEMP25N__definition.xml")
-IND_DESC <- XML::xmlToDataFrame(EMP_DEF_FILE)
-names(IND_DESC) <- c("LineCode","Description")
-glimpse(IND_DESC)
-head(IND_DESC,5)
+DT::datatable(EMP_DAT_CAT)
 
 temp_name <- names(EMP_DAT_CAT [,c(4:24)])
 EMP_DAT_CAT_SAN <-  data.frame(lapply(EMP_DAT_CAT [,c(4:24)],function(x) {
                       gsub("(D)|(T)",NA,x)
                     })) 
-
 names(EMP_DAT_CAT_SAN) = temp_name
+DT::datatable(EMP_DAT_CAT_SAN)
 
 EMP_DAT_CAT_SAN <- cbind(EMP_DAT_CAT[,c(1:3)],EMP_DAT_CAT_SAN)
 DT::datatable(EMP_DAT_CAT_SAN)
+```
 
-EMP_DAT_CAT_SAN %>% filter(GeoName=="New York")
+### Employment in New York from Select Industry
+
+```{r emp-data-ny, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+EMP_DAT_CAT_SAN_NY <- EMP_DAT_CAT_SAN %>% 
+                        filter(LineCode %in% c(705,1100,800,1600,1500)) %>% 
+                        filter(GeoName=="New York") %>% 
+                        reshape2::melt(
+                          id.vars = c("LineCode","Description","GeoName"), 
+                          variable.name = "Year", 
+                          value.name = "Number of jobs")
+
+EMP_DAT_CAT_SAN_NY %>%
+  #sample_frac(0.33) %>% 
+  DT::datatable()
 ```
 
 ## Load CPI Data
@@ -599,169 +613,242 @@ cu_data_17_USEducationAndCommunication = cu_data_17_USEducationAndCommunication 
 DT::datatable((cu_data_17_USEducationAndCommunication))
 ```
 
-# Data Mapping - Employment vs CPI
+# Employment vs CPI in NY - by Industry
 
-## CPI Data by Industry
-
-### Food & Beverages
+## Food & Beverages
 
 ```{r CpiEmpFoodBeverage, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
-cu_emp_data_USFoodBeverage = cu_data_USFoodBeverage %>% 
-                               mutate(parent_item_code = 'SAF', emp_line_code = 705) %>% 
-                               select(c("parent_item_code",
-                                        "emp_line_code",
-                                        "series_id",
-                                        "series_title",
-                                        "year",
-                                        "period",
-                                        "period_abbr",
-                                        "period_name",
-                                        "value",
-                                        "area_code",
-                                        "area_name",
-                                        "area_display_level",
-                                        "area_selectable",
-                                        "area_sort_sequence",
-                                        "item_code",
-                                        "item_name",
-                                        "item_display_level",
-                                        "item_selectable",
-                                        "item_sort_sequence",
-                                        "seasonal",
-                                        "periodicity_code",
-                                        "periodicity_name",
-                                        "base_code",
-                                        "base_name",
-                                        "base_period"))
-DT::datatable(head(cu_emp_data_USFoodBeverage))
+cu_emp_data_USFoodBeverage_NY = cu_data_USFoodBeverage %>% 
+                                  filter(area_name=="New York-Northern New Jersey-Long Island") %>% 
+                                  mutate(parent_item_code = 'SAF', emp_line_code = 705) %>% 
+                                   select(c("parent_item_code",
+                                            "emp_line_code",
+                                            "series_id",
+                                            "series_title",
+                                            "year",
+                                            "period",
+                                            "period_abbr",
+                                            "period_name",
+                                            "value",
+                                            "area_code",
+                                            "area_name",
+                                            "area_display_level",
+                                            "area_selectable",
+                                            "area_sort_sequence",
+                                            "item_code",
+                                            "item_name",
+                                            "item_display_level",
+                                            "item_selectable",
+                                            "item_sort_sequence",
+                                            "seasonal",
+                                            "periodicity_code",
+                                            "periodicity_name",
+                                            "base_code",
+                                            "base_name",
+                                            "base_period"))
+#cu_emp_data_USFoodBeverage_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Food and beverage stores
+#EMP_DAT_CAT_SAN_USFoodBeverage_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                      filter(LineCode==705)%>%
+#                                      mutate(parent_line_code = 705)
+
+cpi_emp_data_USFoodBeverage_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USFoodBeverage_NY, 
+                                       by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USFoodBeverage_NY %>%
+  sample_frac(0.33) %>% 
+  DT::datatable()
 ```
 
-### Housing
+## Housing
 ```{r CpiEmpHousing, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
-cu_emp_data_USHousing = cu_data_USHousing %>% 
-                           mutate(parent_item_code = 'SAH', emp_line_code = 1100) %>% 
-                           select(c("parent_item_code",
-                                    "emp_line_code",
-                                    "series_id",
-                                    "series_title",
-                                    "year",
-                                    "period",
-                                    "period_abbr",
-                                    "period_name",
-                                    "value",
-                                    "area_code",
-                                    "area_name",
-                                    "area_display_level",
-                                    "area_selectable",
-                                    "area_sort_sequence",
-                                    "item_code",
-                                    "item_name",
-                                    "item_display_level",
-                                    "item_selectable",
-                                    "item_sort_sequence",
-                                    "seasonal",
-                                    "periodicity_code",
-                                    "periodicity_name",
-                                    "base_code",
-                                    "base_name",
-                                    "base_period"))
-DT::datatable(head(cu_emp_data_USHousing))
+cu_emp_data_USHousing_NY = cu_data_USHousing  %>% 
+                            filter(area_name=="New York-Northern New Jersey-Long Island") %>% 
+                            mutate(parent_item_code = 'SAH', emp_line_code = 1100) %>% 
+                            select(c("parent_item_code",
+                                     "emp_line_code",
+                                     "series_id",
+                                     "series_title",
+                                     "year",
+                                     "period",
+                                     "period_abbr",
+                                     "period_name",
+                                     "value",
+                                     "area_code",
+                                     "area_name",
+                                     "area_display_level",
+                                     "area_selectable",
+                                     "area_sort_sequence",
+                                     "item_code",
+                                     "item_name",
+                                     "item_display_level",
+                                     "item_selectable",
+                                     "item_sort_sequence",
+                                     "seasonal",
+                                     "periodicity_code",
+                                     "periodicity_name",
+                                     "base_code",
+                                     "base_name",
+                                     "base_period"))
+#cu_emp_data_USHousing_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Real estate and rental and leasing
+#EMP_DAT_CAT_SAN_USHousing_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                  filter(LineCode %in% c(1100,1101,1102,1103)) %>%
+#                                  mutate(parent_line_code = 1100)
+
+cpi_emp_data_USHousing_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USHousing_NY, 
+                                  by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USHousing_NY %>%
+  sample_frac(0.33) %>% 
+  DT::datatable()
 ```
 
-### Transportation
+## Transportation
 ```{r CpiEmpTransportation, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
-cu_emp_data_USTransportation = cu_data_USTransportation %>% 
-                                 mutate(parent_item_code = 'SAT', emp_line_code = 800) %>% 
-                                 select(c("parent_item_code",
-                                          "emp_line_code",
-                                          "series_id",
-                                          "series_title",
-                                          "year",
-                                          "period",
-                                          "period_abbr",
-                                          "period_name",
-                                          "value",
-                                          "area_code",
-                                          "area_name",
-                                          "area_display_level",
-                                          "area_selectable",
-                                          "area_sort_sequence",
-                                          "item_code",
-                                          "item_name",
-                                          "item_display_level",
-                                          "item_selectable",
-                                          "item_sort_sequence",
-                                          "seasonal",
-                                          "periodicity_code",
-                                          "periodicity_name",
-                                          "base_code",
-                                          "base_name",
-                                          "base_period"))
-DT::datatable(head(cu_emp_data_USTransportation))
+cu_emp_data_USTransportation_NY = cu_data_USTransportation %>% 
+                                    filter(area_name=="New York-Northern New Jersey-Long Island") %>% 
+                                    mutate(parent_item_code = 'SAT', emp_line_code = 800) %>% 
+                                    select(c("parent_item_code",
+                                             "emp_line_code",
+                                             "series_id",
+                                             "series_title",
+                                             "year",
+                                             "period",
+                                             "period_abbr",
+                                             "period_name",
+                                             "value",
+                                             "area_code",
+                                             "area_name",
+                                             "area_display_level",
+                                             "area_selectable",
+                                             "area_sort_sequence",
+                                             "item_code",
+                                             "item_name",
+                                             "item_display_level",
+                                             "item_selectable",
+                                             "item_sort_sequence",
+                                             "seasonal",
+                                             "periodicity_code",
+                                             "periodicity_name",
+                                             "base_code",
+                                             "base_name",
+                                             "base_period"))
+cu_emp_data_USTransportation_NY %>%
+  sample_frac(0.33) %>% 
+  DT::datatable()
+
+#Transportation and warehousing
+#EMP_DAT_CAT_SAN_USTransportation_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                        filter(LineCode %in% c(800,801,802,803,804,805,806,807,808,809,811)) %>%
+#                                        mutate(parent_line_code = 800)
+
+cpi_emp_data_USTransportation_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USTransportation_NY, 
+                                         by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USTransportation_NY %>%
+  sample_frac(0.33) %>% 
+  DT::datatable()
 ```
 
-### Medical
+## Medical
 ```{r CpiEmpMedical, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
-cu_emp_data_USMedical = cu_data_USMedical %>% 
-                          mutate(parent_item_code = 'SAM', emp_line_code = 1600) %>% 
-                          select(c("parent_item_code",
-                                   "emp_line_code",
-                                   "series_id",
-                                   "series_title",
-                                   "year",
-                                   "period",
-                                   "period_abbr",
-                                   "period_name",
-                                   "value",
-                                   "area_code",
-                                   "area_name",
-                                   "area_display_level",
-                                   "area_selectable",
-                                   "area_sort_sequence",
-                                   "item_code",
-                                   "item_name",
-                                   "item_display_level",
-                                   "item_selectable",
-                                   "item_sort_sequence",
-                                   "seasonal",
-                                   "periodicity_code",
-                                   "periodicity_name",
-                                   "base_code",
-                                   "base_name",
-                                   "base_period"))
-DT::datatable(head(cu_emp_data_USMedical))
+cu_emp_data_USMedical_NY = cu_data_USMedical %>% 
+                            filter(area_name=="New York-Northern New Jersey-Long Island") %>% 
+                            mutate(parent_item_code = 'SAM', emp_line_code = 1600) %>% 
+                            select(c("parent_item_code",
+                                     "emp_line_code",
+                                     "series_id",
+                                     "series_title",
+                                     "year",
+                                     "period",
+                                     "period_abbr",
+                                     "period_name",
+                                     "value",
+                                     "area_code",
+                                     "area_name",
+                                     "area_display_level",
+                                     "area_selectable",
+                                     "area_sort_sequence",
+                                     "item_code",
+                                     "item_name",
+                                     "item_display_level",
+                                     "item_selectable",
+                                     "item_sort_sequence",
+                                     "seasonal",
+                                     "periodicity_code",
+                                     "periodicity_name",
+                                     "base_code",
+                                     "base_name",
+                                     "base_period"))
+#cu_emp_data_USMedical_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Health care and social assistance
+#EMP_DAT_CAT_SAN_USTransportation_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                        filter(LineCode %in% c(1600,1601,1602,1603,1604)) %>%
+#                                        mutate(parent_line_code = 1600)
+
+cpi_emp_data_USMedical_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USMedical_NY, 
+                                  by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USMedical_NY %>%
+  sample_frac(0.33) %>% 
+  DT::datatable()
 ```
 
-### Education & Communication
+## Education & Communication
 ```{r CpiEmpEduComm, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
-cu_data_USEducationAndCommunication = cu_data_USEducationAndCommunication %>% 
-                                        mutate(parent_item_code = 'SAE', emp_line_code = 1500) %>% 
-                                        select(c("parent_item_code",
-                                                 "emp_line_code",
-                                                 "series_id",
-                                                 "series_title",
-                                                 "year",
-                                                 "period",
-                                                 "period_abbr",
-                                                 "period_name",
-                                                 "value",
-                                                 "area_code",
-                                                 "area_name",
-                                                 "area_display_level",
-                                                 "area_selectable",
-                                                 "area_sort_sequence",
-                                                 "item_code",
-                                                 "item_name",
-                                                 "item_display_level",
-                                                 "item_selectable",
-                                                 "item_sort_sequence",
-                                                 "seasonal",
-                                                 "periodicity_code",
-                                                 "periodicity_name",
-                                                 "base_code",
-                                                 "base_name",
-                                                 "base_period"))
-DT::datatable(head(cu_data_USEducationAndCommunication))
+cu_data_USEducationAndCommunication_NY = cu_data_USEducationAndCommunication %>% 
+                                          filter(area_name=="New York-Northern New Jersey-Long Island") %>% 
+                                          mutate(parent_item_code = 'SAE', emp_line_code = 1500) %>% 
+                                          select(c("parent_item_code",
+                                                   "emp_line_code",
+                                                   "series_id",
+                                                   "series_title",
+                                                   "year",
+                                                   "period",
+                                                   "period_abbr",
+                                                   "period_name",
+                                                   "value",
+                                                   "area_code",
+                                                   "area_name",
+                                                   "area_display_level",
+                                                   "area_selectable",
+                                                   "area_sort_sequence",
+                                                   "item_code",
+                                                   "item_name",
+                                                   "item_display_level",
+                                                   "item_selectable",
+                                                   "item_sort_sequence",
+                                                   "seasonal",
+                                                   "periodicity_code",
+                                                   "periodicity_name",
+                                                   "base_code",
+                                                   "base_name",
+                                                   "base_period"))
+#cu_data_USEducationAndCommunication_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Educational services
+#EMP_DAT_CAT_SAN_USEducationAndCommunication_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                                   filter(LineCode %in% c(1500)) %>%
+#                                                   mutate(parent_line_code = 1500)
+
+cpi_emp_data_USEducationAndCommunication_NY = merge(EMP_DAT_CAT_SAN_NY, cu_data_USEducationAndCommunication_NY, 
+                                                    by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USEducationAndCommunication_NY %>%
+  sample_frac(0.33) %>% 
+  DT::datatable()
 ```
 
 
