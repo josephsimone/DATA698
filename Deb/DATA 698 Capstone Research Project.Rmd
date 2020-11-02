@@ -110,7 +110,9 @@ EMP_DAT_CAT_SAN <- cbind(EMP_DAT_CAT[,c(1:3)],EMP_DAT_CAT_SAN)
 #DT::datatable(EMP_DAT_CAT_SAN)
 ```
 
-### Employment in New York from Select Industry
+### Employment from Select Industry by Area
+
+#### NY - New York
 
 ```{r emp-data-ny, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 EMP_DAT_CAT_SAN_NY <- EMP_DAT_CAT_SAN %>% 
@@ -122,6 +124,38 @@ EMP_DAT_CAT_SAN_NY <- EMP_DAT_CAT_SAN %>%
                           value.name = "Number of jobs")
 
 EMP_DAT_CAT_SAN_NY %>%
+  #sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
+#### MI - Michigan
+
+```{r emp-data-mi, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+EMP_DAT_CAT_SAN_MI <- EMP_DAT_CAT_SAN %>% 
+                        filter(LineCode %in% c(705,1100,800,1600,1500)) %>% 
+                        filter(GeoName=="Michigan") %>% 
+                        reshape2::melt(
+                          id.vars = c("LineCode","Description","GeoName"), 
+                          variable.name = "Year", 
+                          value.name = "Number of jobs")
+
+EMP_DAT_CAT_SAN_MI %>%
+  #sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
+#### OR - Oregon
+
+```{r emp-data-or, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+EMP_DAT_CAT_SAN_OR <- EMP_DAT_CAT_SAN %>% 
+                        filter(LineCode %in% c(705,1100,800,1600,1500)) %>% 
+                        filter(GeoName=="Oregon") %>% 
+                        reshape2::melt(
+                          id.vars = c("LineCode","Description","GeoName"), 
+                          variable.name = "Year", 
+                          value.name = "Number of jobs")
+
+EMP_DAT_CAT_SAN_OR %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
 ```
@@ -613,11 +647,13 @@ cu_data_17_USEducationAndCommunication = cu_data_17_USEducationAndCommunication 
 DT::datatable((cu_data_17_USEducationAndCommunication))
 ```
 
-# Employment vs CPI in NY - by Industry
+# Employment vs CPI - by Industry and Area
 
 ## Food & Beverages
 
-```{r CpiEmpFoodBeverage, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+### NY - New York
+
+```{r CpiEmpFoodBeverageNY, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cu_emp_data_USFoodBeverage_NY = cu_data_USFoodBeverage %>% 
                                   filter(area_name=="New York-Northern New Jersey-Long Island", 
                                          period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
@@ -667,8 +703,116 @@ cpi_emp_data_USFoodBeverage_NY %>%
   DT::datatable()
 ```
 
+### MI - Michigan
+
+```{r CpiEmpFoodBeverageMI, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+cu_emp_data_USFoodBeverage_MI = cu_data_USFoodBeverage %>% 
+                                  filter(area_name=="Detroit-Ann Arbor-Flint", 
+                                         period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
+                                  mutate(parent_item_code = 'SAF', 
+                                         emp_line_code = 705) %>% 
+                                   select(c("parent_item_code",
+                                            "emp_line_code",
+                                            "series_id",
+                                            "series_title",
+                                            "year",
+                                            "period",
+                                            "period_abbr",
+                                            "period_name",
+                                            "value",
+                                            "area_code",
+                                            "area_name",
+                                            "area_display_level",
+                                            "area_selectable",
+                                            "area_sort_sequence",
+                                            "item_code",
+                                            "item_name",
+                                            "item_display_level",
+                                            "item_selectable",
+                                            "item_sort_sequence",
+                                            "seasonal",
+                                            "periodicity_code",
+                                            "periodicity_name",
+                                            "base_code",
+                                            "base_name",
+                                            "base_period")) %>% 
+                                  group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                                  summarise(cpi_value = sum(value))
+#cu_emp_data_USFoodBeverage_MI %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Food and beverage stores
+#EMP_DAT_CAT_SAN_USFoodBeverage_MI = EMP_DAT_CAT_SAN_NY %>%
+#                                      filter(LineCode==705)%>%
+#                                      mutate(parent_line_code = 705)
+
+cpi_emp_data_USFoodBeverage_MI = merge(EMP_DAT_CAT_SAN_MI, cu_emp_data_USFoodBeverage_MI, 
+                                       by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USFoodBeverage_MI %>%
+#  sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
+### OR - Oregon
+
+```{r CpiEmpFoodBeverageOR, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+cu_emp_data_USFoodBeverage_OR = cu_data_USFoodBeverage %>% 
+                                  filter(area_name=="Portland-Salem", 
+                                         period %in% c("S01","S02")) %>% 
+                                  mutate(parent_item_code = 'SAF', 
+                                         emp_line_code = 705) %>% 
+                                   select(c("parent_item_code",
+                                            "emp_line_code",
+                                            "series_id",
+                                            "series_title",
+                                            "year",
+                                            "period",
+                                            "period_abbr",
+                                            "period_name",
+                                            "value",
+                                            "area_code",
+                                            "area_name",
+                                            "area_display_level",
+                                            "area_selectable",
+                                            "area_sort_sequence",
+                                            "item_code",
+                                            "item_name",
+                                            "item_display_level",
+                                            "item_selectable",
+                                            "item_sort_sequence",
+                                            "seasonal",
+                                            "periodicity_code",
+                                            "periodicity_name",
+                                            "base_code",
+                                            "base_name",
+                                            "base_period")) %>% 
+                                  group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                                  summarise(cpi_value = sum(value))
+
+#cu_emp_data_USFoodBeverage_MI %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Food and beverage stores
+#EMP_DAT_CAT_SAN_USFoodBeverage_MI = EMP_DAT_CAT_SAN_NY %>%
+#                                      filter(LineCode==705)%>%
+#                                      mutate(parent_line_code = 705)
+
+cpi_emp_data_USFoodBeverage_OR = merge(EMP_DAT_CAT_SAN_OR, cu_emp_data_USFoodBeverage_OR, 
+                                       by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USFoodBeverage_OR %>%
+#  sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
 ## Housing
-```{r CpiEmpHousing, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+
+### NY - New York
+
+```{r CpiEmpHousingNY, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cu_emp_data_USHousing_NY = cu_data_USHousing  %>% 
                             filter(area_name=="New York-Northern New Jersey-Long Island", 
                                    period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
@@ -718,8 +862,115 @@ cpi_emp_data_USHousing_NY %>%
   DT::datatable()
 ```
 
+### MI - Michigan
+
+```{r CpiEmpHousingMI, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+cu_emp_data_USHousing_MI = cu_data_USHousing  %>% 
+                            filter(area_name=="Detroit-Ann Arbor-Flint", 
+                                   period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
+                            mutate(parent_item_code = 'SAH', 
+                                   emp_line_code = 1100) %>% 
+                            select(c("parent_item_code",
+                                     "emp_line_code",
+                                     "series_id",
+                                     "series_title",
+                                     "year",
+                                     "period",
+                                     "period_abbr",
+                                     "period_name",
+                                     "value",
+                                     "area_code",
+                                     "area_name",
+                                     "area_display_level",
+                                     "area_selectable",
+                                     "area_sort_sequence",
+                                     "item_code",
+                                     "item_name",
+                                     "item_display_level",
+                                     "item_selectable",
+                                     "item_sort_sequence",
+                                     "seasonal",
+                                     "periodicity_code",
+                                     "periodicity_name",
+                                     "base_code",
+                                     "base_name",
+                                     "base_period")) %>% 
+                            group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                            summarise(cpi_value = sum(value))
+#cu_emp_data_USHousing_MI %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Real estate and rental and leasing
+#EMP_DAT_CAT_SAN_USHousing_MI = EMP_DAT_CAT_SAN_MI %>%
+#                                  filter(LineCode %in% c(1100,1101,1102,1103)) %>%
+#                                  mutate(parent_line_code = 1100)
+
+cpi_emp_data_USHousing_MI = merge(EMP_DAT_CAT_SAN_MI, cu_emp_data_USHousing_MI, 
+                                  by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USHousing_MI %>%
+#  sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
+### OR - Oregon
+
+```{r CpiEmpHousingOR, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+cu_emp_data_USHousing_OR = cu_data_USHousing  %>% 
+                            filter(area_name=="Portland-Salem", 
+                                   period %in% c("S01","S02")) %>% 
+                            mutate(parent_item_code = 'SAH', 
+                                   emp_line_code = 1100) %>% 
+                            select(c("parent_item_code",
+                                     "emp_line_code",
+                                     "series_id",
+                                     "series_title",
+                                     "year",
+                                     "period",
+                                     "period_abbr",
+                                     "period_name",
+                                     "value",
+                                     "area_code",
+                                     "area_name",
+                                     "area_display_level",
+                                     "area_selectable",
+                                     "area_sort_sequence",
+                                     "item_code",
+                                     "item_name",
+                                     "item_display_level",
+                                     "item_selectable",
+                                     "item_sort_sequence",
+                                     "seasonal",
+                                     "periodicity_code",
+                                     "periodicity_name",
+                                     "base_code",
+                                     "base_name",
+                                     "base_period")) %>% 
+                            group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                            summarise(cpi_value = sum(value))
+#cu_emp_data_USHousing_MI %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Real estate and rental and leasing
+#EMP_DAT_CAT_SAN_USHousing_MI = EMP_DAT_CAT_SAN_MI %>%
+#                                  filter(LineCode %in% c(1100,1101,1102,1103)) %>%
+#                                  mutate(parent_line_code = 1100)
+
+cpi_emp_data_USHousing_OR = merge(EMP_DAT_CAT_SAN_OR, cu_emp_data_USHousing_OR, 
+                                  by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USHousing_OR %>%
+#  sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
 ## Transportation
-```{r CpiEmpTransportation, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+
+### NY - New York
+
+```{r CpiEmpTransportationNY, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cu_emp_data_USTransportation_NY = cu_data_USTransportation %>% 
                                     filter(area_name=="New York-Northern New Jersey-Long Island", 
                                            period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
@@ -769,8 +1020,115 @@ cpi_emp_data_USTransportation_NY %>%
   DT::datatable()
 ```
 
+### MI - Michigan
+
+```{r CpiEmpTransportationMI, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+cu_emp_data_USTransportation_MI = cu_data_USTransportation %>% 
+                                    filter(area_name=="Detroit-Ann Arbor-Flint", 
+                                           period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
+                                    mutate(parent_item_code = 'SAT', 
+                                           emp_line_code = 800) %>% 
+                                    select(c("parent_item_code",
+                                             "emp_line_code",
+                                             "series_id",
+                                             "series_title",
+                                             "year",
+                                             "period",
+                                             "period_abbr",
+                                             "period_name",
+                                             "value",
+                                             "area_code",
+                                             "area_name",
+                                             "area_display_level",
+                                             "area_selectable",
+                                             "area_sort_sequence",
+                                             "item_code",
+                                             "item_name",
+                                             "item_display_level",
+                                             "item_selectable",
+                                             "item_sort_sequence",
+                                             "seasonal",
+                                             "periodicity_code",
+                                             "periodicity_name",
+                                             "base_code",
+                                             "base_name",
+                                             "base_period")) %>% 
+                                    group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                                    summarise(cpi_value = sum(value))
+#cu_emp_data_USTransportation_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Transportation and warehousing
+#EMP_DAT_CAT_SAN_USTransportation_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                        filter(LineCode %in% c(800,801,802,803,804,805,806,807,808,809,811)) %>%
+#                                        mutate(parent_line_code = 800)
+
+cpi_emp_data_USTransportation_MI = merge(EMP_DAT_CAT_SAN_MI, cu_emp_data_USTransportation_MI, 
+                                         by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USTransportation_MI %>%
+#  sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
+### OR - Oregon
+
+```{r CpiEmpTransportationOR, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+cu_emp_data_USTransportation_OR = cu_data_USTransportation %>% 
+                                    filter(area_name=="Portland-Salem", 
+                                           period %in% c("S01","S02")) %>% 
+                                    mutate(parent_item_code = 'SAT', 
+                                           emp_line_code = 800) %>% 
+                                    select(c("parent_item_code",
+                                             "emp_line_code",
+                                             "series_id",
+                                             "series_title",
+                                             "year",
+                                             "period",
+                                             "period_abbr",
+                                             "period_name",
+                                             "value",
+                                             "area_code",
+                                             "area_name",
+                                             "area_display_level",
+                                             "area_selectable",
+                                             "area_sort_sequence",
+                                             "item_code",
+                                             "item_name",
+                                             "item_display_level",
+                                             "item_selectable",
+                                             "item_sort_sequence",
+                                             "seasonal",
+                                             "periodicity_code",
+                                             "periodicity_name",
+                                             "base_code",
+                                             "base_name",
+                                             "base_period")) %>% 
+                                    group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                                    summarise(cpi_value = sum(value))
+#cu_emp_data_USTransportation_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Transportation and warehousing
+#EMP_DAT_CAT_SAN_USTransportation_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                        filter(LineCode %in% c(800,801,802,803,804,805,806,807,808,809,811)) %>%
+#                                        mutate(parent_line_code = 800)
+
+cpi_emp_data_USTransportation_OR = merge(EMP_DAT_CAT_SAN_OR, cu_emp_data_USTransportation_OR, 
+                                         by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USTransportation_OR %>%
+#  sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
 ## Medical
-```{r CpiEmpMedical, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+
+### NY - New York
+
+```{r CpiEmpMedicalNY, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cu_emp_data_USMedical_NY = cu_data_USMedical %>% 
                             filter(area_name=="New York-Northern New Jersey-Long Island", 
                                    period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
@@ -820,8 +1178,115 @@ cpi_emp_data_USMedical_NY %>%
   DT::datatable()
 ```
 
+### MI - Michigan
+
+```{r CpiEmpMedicalMI, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+cu_emp_data_USMedical_MI = cu_data_USMedical %>% 
+                            filter(area_name=="Detroit-Ann Arbor-Flint", 
+                                   period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
+                            mutate(parent_item_code = 'SAM', 
+                                   emp_line_code = 1600) %>% 
+                            select(c("parent_item_code",
+                                     "emp_line_code",
+                                     "series_id",
+                                     "series_title",
+                                     "year",
+                                     "period",
+                                     "period_abbr",
+                                     "period_name",
+                                     "value",
+                                     "area_code",
+                                     "area_name",
+                                     "area_display_level",
+                                     "area_selectable",
+                                     "area_sort_sequence",
+                                     "item_code",
+                                     "item_name",
+                                     "item_display_level",
+                                     "item_selectable",
+                                     "item_sort_sequence",
+                                     "seasonal",
+                                     "periodicity_code",
+                                     "periodicity_name",
+                                     "base_code",
+                                     "base_name",
+                                     "base_period")) %>% 
+                            group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                            summarise(cpi_value = sum(value))
+#cu_emp_data_USMedical_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Health care and social assistance
+#EMP_DAT_CAT_SAN_USTransportation_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                        filter(LineCode %in% c(1600,1601,1602,1603,1604)) %>%
+#                                        mutate(parent_line_code = 1600)
+
+cpi_emp_data_USMedical_MI = merge(EMP_DAT_CAT_SAN_MI, cu_emp_data_USMedical_MI, 
+                                  by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USMedical_MI %>%
+#  sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
+### OR - Oregon
+
+```{r CpiEmpMedicalOR, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+cu_emp_data_USMedical_OR = cu_data_USMedical %>% 
+                            filter(area_name=="Portland-Salem", 
+                                   period %in% c("S01","S02")) %>% 
+                            mutate(parent_item_code = 'SAM', 
+                                   emp_line_code = 1600) %>% 
+                            select(c("parent_item_code",
+                                     "emp_line_code",
+                                     "series_id",
+                                     "series_title",
+                                     "year",
+                                     "period",
+                                     "period_abbr",
+                                     "period_name",
+                                     "value",
+                                     "area_code",
+                                     "area_name",
+                                     "area_display_level",
+                                     "area_selectable",
+                                     "area_sort_sequence",
+                                     "item_code",
+                                     "item_name",
+                                     "item_display_level",
+                                     "item_selectable",
+                                     "item_sort_sequence",
+                                     "seasonal",
+                                     "periodicity_code",
+                                     "periodicity_name",
+                                     "base_code",
+                                     "base_name",
+                                     "base_period")) %>% 
+                            group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                            summarise(cpi_value = sum(value))
+#cu_emp_data_USMedical_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Health care and social assistance
+#EMP_DAT_CAT_SAN_USTransportation_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                        filter(LineCode %in% c(1600,1601,1602,1603,1604)) %>%
+#                                        mutate(parent_line_code = 1600)
+
+cpi_emp_data_USMedical_OR = merge(EMP_DAT_CAT_SAN_OR, cu_emp_data_USMedical_OR, 
+                                  by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USMedical_OR %>%
+#  sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
 ## Education & Communication
-```{r CpiEmpEduComm, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+
+### NY - New York
+
+```{r CpiEmpEduCommNY, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cu_data_USEducationAndCommunication_NY = cu_data_USEducationAndCommunication %>% 
                                           filter(area_name=="New York-Northern New Jersey-Long Island", 
                                                  period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
@@ -870,6 +1335,107 @@ cpi_emp_data_USEducationAndCommunication_NY %>%
   DT::datatable()
 ```
 
+### MI - Michigan
+
+```{r CpiEmpEduCommMI, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+cu_data_USEducationAndCommunication_MI = cu_data_USEducationAndCommunication %>% 
+                                          filter(area_name=="Detroit-Ann Arbor-Flint", 
+                                                 period %in% c("M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12")) %>% 
+                                          mutate(parent_item_code = 'SAE', emp_line_code = 1500) %>% 
+                                          select(c("parent_item_code",
+                                                   "emp_line_code",
+                                                   "series_id",
+                                                   "series_title",
+                                                   "year",
+                                                   "period",
+                                                   "period_abbr",
+                                                   "period_name",
+                                                   "value",
+                                                   "area_code",
+                                                   "area_name",
+                                                   "area_display_level",
+                                                   "area_selectable",
+                                                   "area_sort_sequence",
+                                                   "item_code",
+                                                   "item_name",
+                                                   "item_display_level",
+                                                   "item_selectable",
+                                                   "item_sort_sequence",
+                                                   "seasonal",
+                                                   "periodicity_code",
+                                                   "periodicity_name",
+                                                   "base_code",
+                                                   "base_name",
+                                                   "base_period")) %>% 
+                                          group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                                          summarise(cpi_value = sum(value))
+#cu_data_USEducationAndCommunication_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Educational services
+#EMP_DAT_CAT_SAN_USEducationAndCommunication_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                                   filter(LineCode %in% c(1500)) %>%
+#                                                   mutate(parent_line_code = 1500)
+
+cpi_emp_data_USEducationAndCommunication_MI = merge(EMP_DAT_CAT_SAN_MI, cu_data_USEducationAndCommunication_MI, 
+                                                    by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USEducationAndCommunication_MI %>%
+#  sample_frac(0.33) %>% 
+  DT::datatable()
+```
+
+### OR - Oregon
+
+```{r CpiEmpEduCommOR, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+cu_data_USEducationAndCommunication_OR = cu_data_USEducationAndCommunication %>% 
+                                          filter(area_name=="Portland-Salem", 
+                                                 period %in% c("S01","S02")) %>% 
+                                          mutate(parent_item_code = 'SAE', emp_line_code = 1500) %>% 
+                                          select(c("parent_item_code",
+                                                   "emp_line_code",
+                                                   "series_id",
+                                                   "series_title",
+                                                   "year",
+                                                   "period",
+                                                   "period_abbr",
+                                                   "period_name",
+                                                   "value",
+                                                   "area_code",
+                                                   "area_name",
+                                                   "area_display_level",
+                                                   "area_selectable",
+                                                   "area_sort_sequence",
+                                                   "item_code",
+                                                   "item_name",
+                                                   "item_display_level",
+                                                   "item_selectable",
+                                                   "item_sort_sequence",
+                                                   "seasonal",
+                                                   "periodicity_code",
+                                                   "periodicity_name",
+                                                   "base_code",
+                                                   "base_name",
+                                                   "base_period")) %>% 
+                                          group_by(parent_item_code, emp_line_code, year, area_code, area_name) %>% 
+                                          summarise(cpi_value = sum(value))
+#cu_data_USEducationAndCommunication_NY %>%
+#  sample_frac(0.33) %>% 
+#  DT::datatable()
+
+#Educational services
+#EMP_DAT_CAT_SAN_USEducationAndCommunication_NY = EMP_DAT_CAT_SAN_NY %>%
+#                                                   filter(LineCode %in% c(1500)) %>%
+#                                                   mutate(parent_line_code = 1500)
+
+cpi_emp_data_USEducationAndCommunication_OR = merge(EMP_DAT_CAT_SAN_OR, cu_data_USEducationAndCommunication_OR, 
+                                                    by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
+cpi_emp_data_USEducationAndCommunication_OR %>%
+#  sample_frac(0.33) %>% 
+  DT::datatable()
+```
 
 # References
 - [How to import multiple .csv files at once?](https://stackoverflow.com/questions/11433432/how-to-import-multiple-csv-files-at-once)
