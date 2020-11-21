@@ -1470,255 +1470,329 @@ cpi_emp_data_USFoodBeverage_NY  %>% select(c("Year","Sector"= "Description","cpi
 ```
 
 
+```{r}
+ALL_NY <- rbind(cpi_emp_data_USTransportation_NY,
+       cpi_emp_data_USMedical_NY,
+       cpi_emp_data_USHousing_NY,
+       cpi_emp_data_USFoodBeverage_NY,
+      cpi_emp_data_USEducationAndCommunication_NY)
+```
+
+```{r}
+NEW_ALL_NY <- as.data.frame(ALL_NY[,c("Year","Description", "Number of jobs","cpi_value")])
+```
+
+```{r}
+h <- NEW_ALL_NY %>% filter(Description=="Health care and social assistance")
+h
+```
+
+
+```{r}
+e <- NEW_ALL_NY %>% filter(Description=="Educational services")
+e
+```
+
+
+```{r}
+f <- NEW_ALL_NY %>% filter(Description=="Food and beverage stores")
+f
+```
+
+
+```{r}
+r <- NEW_ALL_NY %>% filter(Description=="Real estate and rental and leasing")
+r
+```
+
+
+```{r}
+t <- NEW_ALL_NY %>% filter(Description=="Transportation and warehousing")
+t
+
+
+```
+
+```{r}
+h %>% arrange(desc(cpi_value))
+h
+```
+
+
+```{r}
+e %>% arrange(desc(cpi_value))
+e
+```
+
+
+```{r}
+f %>% arrange(desc(cpi_value))
+f
+```
+
+
+```{r}
+r %>% arrange(desc(cpi_value))
+r
+```
+
+
+```{r}
+t %>% arrange(desc(cpi_value))
+t
+```
+
+
 ## Model
 ```{r}
-library(DataExplorer)
-
-ALL_NY <- rbind(cpi_emp_data_USTransportation_NY,
-      cpi_emp_data_USMedical_NY,
-      cpi_emp_data_USHousing_NY,
-      cpi_emp_data_USFoodBeverage_NY,
-      cpi_emp_data_USEducationAndCommunication_NY)
-
-
-DataExplorer::plot_missing(ALL_NY, title = "Beverage Training Data: % Missing Values by Data Element")
-
-ALL_NY$`Number of jobs` = as.numeric(ALL_NY$`Number of jobs`)
-plot_histogram(ALL_NY, ggtheme=theme_light())
-plot_correlation(ALL_NY[,c(2,5,9)])
-
-ggplot(ALL_NY[,c(2,3,5,9)], mapping= aes(y= log(cpi_value), x=Year,color= Description, group = Description)) + geom_smooth() +
-  theme_classic()
-
-ggplot(ALL_NY[,c(2,3,5,9)], mapping= aes(y= log(`Number of jobs`), x=Year,color= Description, group = Description)) + geom_smooth() + theme_classic()
-```
-
-```{r}
-ALL_NY
-
-ALL_NY_M <- ALL_NY[,c(2,5,6,9)]
-names(ALL_NY_M) = c("Year", "Jobs", "C_Item","CPI")
-
-# ALL_NY_M$Year = as.character(ALL_NY_M$Year)
-# ALL_NY_M$E_Area = as.character(ALL_NY_M$E_Area)
-library(caret)
-set.seed(3456)
-trainIndex <- createDataPartition(ALL_NY_M$Jobs, p = .8, 
-                                  list = FALSE, 
-                                  times = 1)
-ALL_NY_train <- ALL_NY_M[ trainIndex,]
-ALL_NY_test  <- ALL_NY_M[-trainIndex,]
-
-head(ALL_NY_M)
-```
-
-```{r}
-metric = 'RMSE'
-head(ALL_NY_train )
-
-
-# Train control
-
-customTrainControl <- trainControl(method = "repeatedcv", 
-                                   number = 10 , 
-                                   repeats = 5 ,
-                                   verboseIter = F)
-# Linear Model
-
-lm <- train(Jobs ~ .,
-            ALL_NY_train,
-            method= 'lm',
-            trControl = customTrainControl)
-
-lm$results  
-
-
-summary(lm)
-par(mfrow=c(2,2))
-plot(lm$finalModel)
-#--------------
-# https://stackoverflow.com/questions/44200195/how-to-debug-contrasts-can-be-applied-only-to-factors-with-2-or-more-levels-er
-ALL_NY_train %>% dplyr::mutate_all(as.factor) %>% str
-
-unique(ALL_NY$area_code)
-
-
-# multiple LM
-lm_cpi_item <- lm(Jobs ~ CPI+C_Item,ALL_NY_train)
-summary(lm_cpi_item)
-
-lm_cpi2_item <- lm(Jobs ~ (CPI^2)+C_Item,ALL_NY_train)
-summary(lm_cpi2_item)
-
-
-lm_cpi_year <- lm(Jobs ~ CPI+Year,ALL_NY_train)
-summary(lm_cpi_year)
-
-
-xyplot(ALL_NY_test$Jobs ~ predict(lm),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_test$Jobs ~ predict(lm_cpi_year),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-
- xyplot(resid(lm_cpi_year) ~ predict(lm_cpi_year),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-
- 
-  #PLS
- # Useing train perform  to perfrom  pre-process and tuning together. The function first preprocess the training set by centering it and scaling it. Then the function uses 10-fold cross validation to try the number of components, i.e. latent variables, of the PLS model from 1 to 20.
- # # The train function generates a resampling estimate of performance. Because
-# the training set size is not small, 10-fold cross-validation should produce
-# reasonable estimates of model performance. The function trainControl specifies
-# the type of resampling:
-ctrl <- trainControl(method = "cv", number = 10)
-
-model_pls<- train(Jobs ~ .,   ALL_NY_train,
-                     method = "pls",
-                     tuneLength = 20,
-                     metric='Rsquared',
-                     trControl = ctrl,
-                     preProc = c("center", "scale"))
-
-model_pls
-
-model_pls$results[3,2:4]
-
-# M
-
-model_glm<- train(Jobs ~ .,   ALL_NY_train,
-                     method = "glm",
-                     tuneLength = 20,
-                     metric='Rsquared',
-                     trControl = ctrl,
-                     preProc = c("center", "scale"))
-
-model_glm
+# library(DataExplorer)
+# 
+# ALL_NY <- rbind(cpi_emp_data_USTransportation_NY,
+#       cpi_emp_data_USMedical_NY,
+#       cpi_emp_data_USHousing_NY,
+#       cpi_emp_data_USFoodBeverage_NY,
+#       cpi_emp_data_USEducationAndCommunication_NY)
+# 
+# 
+# DataExplorer::plot_missing(ALL_NY, title = "Beverage Training Data: % Missing Values by Data Element")
+# 
+# ALL_NY$`Number of jobs` = as.numeric(ALL_NY$`Number of jobs`)
+# plot_histogram(ALL_NY, ggtheme=theme_light())
+# plot_correlation(ALL_NY[,c(2,5,9)])
+# 
+# ggplot(ALL_NY[,c(2,3,5,9)], mapping= aes(y= log(cpi_value), x=Year,color= Description, group = Description)) + geom_smooth() +
+#   theme_classic()
+# 
+# ggplot(ALL_NY[,c(2,3,5,9)], mapping= aes(y= log(`Number of jobs`), x=Year,color= Description, group = Description)) + geom_smooth() + theme_classic()
 
 ```
 
+```{r}
+# ALL_NY
+# 
+# ALL_NY_M <- ALL_NY[,c(2,5,6,9)]
+# names(ALL_NY_M) = c("Year", "Jobs", "C_Item","CPI")
+# 
+# # ALL_NY_M$Year = as.character(ALL_NY_M$Year)
+# # ALL_NY_M$E_Area = as.character(ALL_NY_M$E_Area)
+# library(caret)
+# set.seed(3456)
+# trainIndex <- createDataPartition(ALL_NY_M$Jobs, p = .8, 
+#                                   list = FALSE, 
+#                                   times = 1)
+# ALL_NY_train <- ALL_NY_M[ trainIndex,]
+# ALL_NY_test  <- ALL_NY_M[-trainIndex,]
+# 
+# head(ALL_NY_M)
+```
+
+```{r}
+# metric = 'RMSE'
+# head(ALL_NY_train )
+# 
+# 
+# # Train control
+# 
+# customTrainControl <- trainControl(method = "repeatedcv", 
+#                                    number = 10 , 
+#                                    repeats = 5 ,
+#                                    verboseIter = F)
+# # Linear Model
+# 
+# lm <- train(Jobs ~ .,
+#             ALL_NY_train,
+#             method= 'lm',
+#             trControl = customTrainControl)
+# 
+# lm$results  
+# 
+# 
+# summary(lm)
+# par(mfrow=c(2,2))
+# plot(lm$finalModel)
+# #--------------
+# # https://stackoverflow.com/questions/44200195/how-to-debug-contrasts-can-be-applied-only-to-factors-with-2-or-more-levels-er
+# ALL_NY_train %>% dplyr::mutate_all(as.factor) %>% str
+# 
+# unique(ALL_NY$area_code)
+# 
+# 
+# # multiple LM
+# lm_cpi_item <- lm(Jobs ~ CPI+C_Item,ALL_NY_train)
+# summary(lm_cpi_item)
+# 
+# lm_cpi2_item <- lm(Jobs ~ (CPI^2)+C_Item,ALL_NY_train)
+# summary(lm_cpi2_item)
+# 
+# 
+# lm_cpi_year <- lm(Jobs ~ CPI+Year,ALL_NY_train)
+# summary(lm_cpi_year)
+# 
+# 
+# xyplot(ALL_NY_test$Jobs ~ predict(lm),
+#  ## plot the points (type = 'p') and a background grid ('g')
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Observed")
+# 
+# xyplot(ALL_NY_test$Jobs ~ predict(lm_cpi_year),
+#  ## plot the points (type = 'p') and a background grid ('g')
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Observed")
+# 
+# 
+#  xyplot(resid(lm_cpi_year) ~ predict(lm_cpi_year),
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Residuals")
+# 
+#  
+#   #PLS
+#  # Useing train perform  to perfrom  pre-process and tuning together. The function first preprocess the training set by centering it and scaling it. Then the function uses 10-fold cross validation to try the number of components, i.e. latent variables, of the PLS model from 1 to 20.
+#  # # The train function generates a resampling estimate of performance. Because
+# # the training set size is not small, 10-fold cross-validation should produce
+# # reasonable estimates of model performance. The function trainControl specifies
+# # the type of resampling:
+# ctrl <- trainControl(method = "cv", number = 10)
+# 
+# model_pls<- train(Jobs ~ .,   ALL_NY_train,
+#                      method = "pls",
+#                      tuneLength = 20,
+#                      metric='Rsquared',
+#                      trControl = ctrl,
+#                      preProc = c("center", "scale"))
+# 
+# model_pls
+# 
+# model_pls$results[3,2:4]
+# 
+# # M
+# 
+# model_glm<- train(Jobs ~ .,   ALL_NY_train,
+#                      method = "glm",
+#                      tuneLength = 20,
+#                      metric='Rsquared',
+#                      trControl = ctrl,
+#                      preProc = c("center", "scale"))
+# 
+# model_glm
+
+```
+
 
 
 ```{r}
-
-
-
-test_model(model_pls,ALL_NY_train)
-
-
-# TEST MODEL with Train  data
-xyplot(ALL_NY_train$Jobs ~ predict(model_pls),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-
-xyplot(ALL_NY_train$Jobs ~ predict(lm),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_train$Jobs ~ predict(lm_cpi2_item),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-
-xyplot(ALL_NY_train$Jobs ~ predict(lm_cpi_item),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_train$Jobs ~ predict(model_glm),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-# TEST MODEL with TEst data
-xyplot(ALL_NY_test$Jobs ~ predict(model_pls,ALL_NY_test),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_test$Jobs ~ predict(lm,ALL_NY_test),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_test$Jobs ~ predict(lm_cpi_item,ALL_NY_test),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-
-# REssidual Plot with train data
- xyplot(resid(model_pls) ~ predict(model_pls),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
- 
-  xyplot(resid(lm) ~ predict(lm),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-
-     xyplot(resid(lm_cpi_item) ~ predict(lm_cpi_item),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-    
-   xyplot(resid(lm_cpi2_item) ~ predict(lm_cpi2_item),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-
-   
-      xyplot(resid(lm_cpi2_item) ~ predict(lm_cpi2_item),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-      
- 
- # REssidual Plot with Test data
- xyplot(resid(model_pls) ~ predict(model_pls,ALL_NY_test),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
- 
-  xyplot(resid(model_glm) ~ predict(model_glm,ALL_NY_test),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-  
-    xyplot(resid(lm_cpi_item) ~ predict(lm_cpi_item,ALL_NY_test),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-    
-    
-
-    
-data.frame("LM Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm, ALL_NY_test),ALL_NY_test$Jobs))
-
-data.frame("lm_cpi2_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi2_item, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs))
-
-data.frame("lm_cpi_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_item, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs))
-
-data.frame("lm_cpi_year Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_year, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi_year, ALL_NY_test),ALL_NY_test$Jobs))
-
-data.frame("PLS Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(model_pls, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(model_pls, ALL_NY_test),ALL_NY_test$Jobs))
-
-
-cbind(
-  data.frame("LM Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm, ALL_NY_test),ALL_NY_test$Jobs)),
-
-data.frame("lm_cpi2_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi2_item, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs)),
-
-data.frame("lm_cpi_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_item, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs)),
-
-data.frame("lm_cpi_year Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_year, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi_year, ALL_NY_test),ALL_NY_test$Jobs)),
-
-data.frame("PLS Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(model_pls, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(model_pls, ALL_NY_test),ALL_NY_test$Jobs))
-)
-
+# 
+# 
+# 
+# test_model(model_pls,ALL_NY_train)
+# 
+# 
+# # TEST MODEL with Train  data
+# xyplot(ALL_NY_train$Jobs ~ predict(model_pls),
+#  ## plot the points (type = 'p') and a background grid ('g')
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Observed")
+# 
+# 
+# xyplot(ALL_NY_train$Jobs ~ predict(lm),
+#  ## plot the points (type = 'p') and a background grid ('g')
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Observed")
+# 
+# xyplot(ALL_NY_train$Jobs ~ predict(lm_cpi2_item),
+#  ## plot the points (type = 'p') and a background grid ('g')
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Observed")
+# 
+# 
+# xyplot(ALL_NY_train$Jobs ~ predict(lm_cpi_item),
+#  ## plot the points (type = 'p') and a background grid ('g')
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Observed")
+# 
+# xyplot(ALL_NY_train$Jobs ~ predict(model_glm),
+#  ## plot the points (type = 'p') and a background grid ('g')
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Observed")
+# 
+# # TEST MODEL with TEst data
+# xyplot(ALL_NY_test$Jobs ~ predict(model_pls,ALL_NY_test),
+#  ## plot the points (type = 'p') and a background grid ('g')
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Observed")
+# 
+# xyplot(ALL_NY_test$Jobs ~ predict(lm,ALL_NY_test),
+#  ## plot the points (type = 'p') and a background grid ('g')
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Observed")
+# 
+# xyplot(ALL_NY_test$Jobs ~ predict(lm_cpi_item,ALL_NY_test),
+#  ## plot the points (type = 'p') and a background grid ('g')
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Observed")
+# 
+# 
+# # REssidual Plot with train data
+#  xyplot(resid(model_pls) ~ predict(model_pls),
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Residuals")
+#  
+#   xyplot(resid(lm) ~ predict(lm),
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Residuals")
+# 
+#      xyplot(resid(lm_cpi_item) ~ predict(lm_cpi_item),
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Residuals")
+#     
+#    xyplot(resid(lm_cpi2_item) ~ predict(lm_cpi2_item),
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Residuals")
+# 
+#    
+#       xyplot(resid(lm_cpi2_item) ~ predict(lm_cpi2_item),
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Residuals")
+#       
+#  
+#  # REssidual Plot with Test data
+#  xyplot(resid(model_pls) ~ predict(model_pls,ALL_NY_test),
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Residuals")
+#  
+#   xyplot(resid(model_glm) ~ predict(model_glm,ALL_NY_test),
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Residuals")
+#   
+#     xyplot(resid(lm_cpi_item) ~ predict(lm_cpi_item,ALL_NY_test),
+#  type = c("p", "g"),
+#  xlab = "Predicted", ylab = "Residuals")
+#     
+#     
+# 
+#     
+# data.frame("LM Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm, ALL_NY_test),ALL_NY_test$Jobs))
+# 
+# data.frame("lm_cpi2_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi2_item, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs))
+# 
+# data.frame("lm_cpi_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_item, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs))
+# 
+# data.frame("lm_cpi_year Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_year, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi_year, ALL_NY_test),ALL_NY_test$Jobs))
+# 
+# data.frame("PLS Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(model_pls, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(model_pls, ALL_NY_test),ALL_NY_test$Jobs))
+# 
+# 
+# cbind(
+#   data.frame("LM Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm, ALL_NY_test),ALL_NY_test$Jobs)),
+# 
+# data.frame("lm_cpi2_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi2_item, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs)),
+# 
+# data.frame("lm_cpi_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_item, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs)),
+# 
+# data.frame("lm_cpi_year Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_year, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(lm_cpi_year, ALL_NY_test),ALL_NY_test$Jobs)),
+# 
+# data.frame("PLS Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(model_pls, ALL_NY_test))),"MAPE" =  MLmetrics::MAPE(predict(model_pls, ALL_NY_test),ALL_NY_test$Jobs))
+# )
+# 
 
 
 ```
