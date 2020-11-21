@@ -6,5 +6,5 @@ server: rpubs.com
 hostUrl: rpubs.com
 appId: https://api.rpubs.com/api/v1/document/689898/a7eaa596d44a4471b9fff8ebd1aa3c57
 bundleId: https://api.rpubs.com/api/v1/document/689898/a7eaa596d44a4471b9fff8ebd1aa3c57
-url: http://rpubs.com/publish/claim/689898/ffccec495934416a9f2856f712b4ecb4
-when: 1605147061.12568
+url: http://rpubs.com/destination4debabrata/689898
+when: 1606002715.06865
