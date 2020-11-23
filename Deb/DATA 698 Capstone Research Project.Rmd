@@ -346,36 +346,6 @@ cu_data_USFoodBeverage = cu_data_0_Current %>%
                                         "base_period"))
 DT::datatable(head(cu_data_USFoodBeverage))
 ```
-```{r 11USFoodBeverage, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
-cu_data_11_USFoodBeverage = cu_data_11_USFoodBeverage %>% 
-                              inner_join(cu_reference_data, by="series_id") %>% 
-                              inner_join(cu_period, by="period") %>% 
-                               filter(year %in% (1998:2018)) %>% 
-                               select(c("series_id",
-                                        "series_title",
-                                        "year",
-                                        "period",
-                                        "period_abbr",
-                                        "period_name",
-                                        "value",
-                                        "area_code",
-                                        "area_name",
-                                        "area_display_level",
-                                        "area_selectable",
-                                        "area_sort_sequence",
-                                        "item_code",
-                                        "item_name",
-                                        "item_display_level",
-                                        "item_selectable",
-                                        "item_sort_sequence",
-                                        "seasonal",
-                                        "periodicity_code",
-                                        "periodicity_name",
-                                        "base_code",
-                                        "base_name",
-                                        "base_period"))
-DT::datatable((cu_data_11_USFoodBeverage))
-```
 
 ### CPI - US Housing
 ```{r USHousing, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
@@ -415,36 +385,6 @@ cu_data_USHousing = cu_data_0_Current %>%
                                         "base_period"))
 DT::datatable(head(cu_data_USHousing))
 ```
-```{r 12USHousing, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
-cu_data_12_USHousing = cu_data_12_USHousing %>% 
-                        inner_join(cu_reference_data, by="series_id") %>% 
-                        inner_join(cu_period, by="period") %>% 
-                         filter(year %in% (1998:2018)) %>% 
-                         select(c("series_id",
-                                  "series_title",
-                                  "year",
-                                  "period",
-                                  "period_abbr",
-                                  "period_name",
-                                  "value",
-                                  "area_code",
-                                  "area_name",
-                                  "area_display_level",
-                                  "area_selectable",
-                                  "area_sort_sequence",
-                                  "item_code",
-                                  "item_name",
-                                  "item_display_level",
-                                  "item_selectable",
-                                  "item_sort_sequence",
-                                  "seasonal",
-                                  "periodicity_code",
-                                  "periodicity_name",
-                                  "base_code",
-                                  "base_name",
-                                  "base_period"))
-DT::datatable((cu_data_12_USHousing))
-```
 
 ### CPI - US Transportation
 ```{r USTransportation, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
@@ -482,36 +422,6 @@ cu_data_USTransportation = cu_data_0_Current %>%
                                         "base_period"))
 DT::datatable(head(cu_data_USTransportation))
 ```
-```{r 14USTransportation, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
-cu_data_14_USTransportation = cu_data_14_USTransportation %>% 
-                               inner_join(cu_reference_data, by="series_id") %>% 
-                               inner_join(cu_period, by="period") %>% 
-                                filter(year %in% (1998:2018)) %>% 
-                                select(c("series_id",
-                                         "series_title",
-                                         "year",
-                                         "period",
-                                         "period_abbr",
-                                         "period_name",
-                                         "value",
-                                         "area_code",
-                                         "area_name",
-                                         "area_display_level",
-                                         "area_selectable",
-                                         "area_sort_sequence",
-                                         "item_code",
-                                         "item_name",
-                                         "item_display_level",
-                                         "item_selectable",
-                                         "item_sort_sequence",
-                                         "seasonal",
-                                         "periodicity_code",
-                                         "periodicity_name",
-                                         "base_code",
-                                         "base_name",
-                                         "base_period"))
-DT::datatable((cu_data_14_USTransportation))
-```
 
 ### CPI - US Medical
 ```{r USMedical, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
@@ -548,36 +458,6 @@ cu_data_USMedical = cu_data_0_Current %>%
                                         "base_name",
                                         "base_period"))
 DT::datatable(head(cu_data_USMedical))
-```
-```{r 15USMedical, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
-cu_data_15_USMedical = cu_data_15_USMedical %>% 
-                        inner_join(cu_reference_data, by="series_id") %>% 
-                        inner_join(cu_period, by="period") %>% 
-                         filter(year %in% (1998:2018)) %>% 
-                         select(c("series_id",
-                                  "series_title",
-                                  "year",
-                                  "period",
-                                  "period_abbr",
-                                  "period_name",
-                                  "value",
-                                  "area_code",
-                                  "area_name",
-                                  "area_display_level",
-                                  "area_selectable",
-                                  "area_sort_sequence",
-                                  "item_code",
-                                  "item_name",
-                                  "item_display_level",
-                                  "item_selectable",
-                                  "item_sort_sequence",
-                                  "seasonal",
-                                  "periodicity_code",
-                                  "periodicity_name",
-                                  "base_code",
-                                  "base_name",
-                                  "base_period"))
-DT::datatable((cu_data_15_USMedical))
 ```
 
 ### CPI - US Education And Communication
