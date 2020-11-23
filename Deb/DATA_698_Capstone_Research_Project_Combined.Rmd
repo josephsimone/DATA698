@@ -5434,8 +5434,6 @@ cpi_emp_data_USEducationAndCommunication_WI %>%
   DT::datatable()
 ```
 
-
-
 ## Combined Employment and CPI Data
 ```{r CpiEmpCombined, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 cpi_emp_data_Combined <- rbind(cpi_emp_data_USFoodBeverage_AK,
@@ -5548,6 +5546,118 @@ cpi_emp_data_Combined %>%
 
 
 # Joe's Work
+
+
+```{r}
+ALL_FB <-rbind(cpi_emp_data_USFoodBeverage_AK,
+                                cpi_emp_data_USFoodBeverage_AZ,
+                                cpi_emp_data_USFoodBeverage_CA,
+                                cpi_emp_data_USFoodBeverage_CO,
+                                cpi_emp_data_USFoodBeverage_FL,
+                                cpi_emp_data_USFoodBeverage_GA,
+                                cpi_emp_data_USFoodBeverage_HI,
+                                cpi_emp_data_USFoodBeverage_IL,
+                                cpi_emp_data_USFoodBeverage_KS,
+                                cpi_emp_data_USFoodBeverage_MA,
+                                cpi_emp_data_USFoodBeverage_MI,
+                                cpi_emp_data_USFoodBeverage_MN,
+                                cpi_emp_data_USFoodBeverage_MO,
+                                cpi_emp_data_USFoodBeverage_NY,
+                                cpi_emp_data_USFoodBeverage_OH,
+                                cpi_emp_data_USFoodBeverage_OR,
+                                cpi_emp_data_USFoodBeverage_PA,
+                                cpi_emp_data_USFoodBeverage_TX,
+                                cpi_emp_data_USFoodBeverage_WA,
+                                cpi_emp_data_USFoodBeverage_WI)
+
+
+ALL_HOUSING <- rbind( cpi_emp_data_USHousing_AK,
+                                cpi_emp_data_USHousing_AZ,
+                                cpi_emp_data_USHousing_CA,
+                                cpi_emp_data_USHousing_CO,
+                                cpi_emp_data_USHousing_FL,
+                                cpi_emp_data_USHousing_GA,
+                                cpi_emp_data_USHousing_HI,
+                                cpi_emp_data_USHousing_IL,
+                                cpi_emp_data_USHousing_KS,
+                                cpi_emp_data_USHousing_MA,
+                                cpi_emp_data_USHousing_MI,
+                                cpi_emp_data_USHousing_MN,
+                                cpi_emp_data_USHousing_MO,
+                                cpi_emp_data_USHousing_NY,
+                                cpi_emp_data_USHousing_OH,
+                                cpi_emp_data_USHousing_OR,
+                                cpi_emp_data_USHousing_PA,
+                                cpi_emp_data_USHousing_TX,
+                                cpi_emp_data_USHousing_WA,
+                                cpi_emp_data_USHousing_WI)
+
+ALL_TRANSPORT <- rbind( cpi_emp_data_USTransportation_AK,
+                                cpi_emp_data_USTransportation_CA,
+                                cpi_emp_data_USTransportation_CO,
+                                cpi_emp_data_USTransportation_FL,
+                                cpi_emp_data_USTransportation_GA,
+                                cpi_emp_data_USTransportation_HI,
+                                cpi_emp_data_USTransportation_IL,
+                                cpi_emp_data_USTransportation_KS,
+                                cpi_emp_data_USTransportation_MA,
+                                cpi_emp_data_USTransportation_MI,
+                                cpi_emp_data_USTransportation_MN,
+                                cpi_emp_data_USTransportation_MO,
+                                cpi_emp_data_USTransportation_NY,
+                                cpi_emp_data_USTransportation_OH,
+                                cpi_emp_data_USTransportation_OR,
+                                cpi_emp_data_USTransportation_PA,
+                                cpi_emp_data_USTransportation_TX,
+                                cpi_emp_data_USTransportation_WA,
+                                cpi_emp_data_USTransportation_WI)
+
+ALL_MEDICAL <- rbind(  cpi_emp_data_USMedical_AK,
+                                cpi_emp_data_USMedical_AZ,
+                                cpi_emp_data_USMedical_CA,
+                                cpi_emp_data_USMedical_CO,
+                                cpi_emp_data_USMedical_FL,
+                                cpi_emp_data_USMedical_GA,
+                                cpi_emp_data_USMedical_HI,
+                                cpi_emp_data_USMedical_IL,
+                                cpi_emp_data_USMedical_KS,
+                                cpi_emp_data_USMedical_MA,
+                                cpi_emp_data_USMedical_MI,
+                                cpi_emp_data_USMedical_MN,
+                                cpi_emp_data_USMedical_MO,
+                                cpi_emp_data_USMedical_NY,
+                                cpi_emp_data_USMedical_OH,
+                                cpi_emp_data_USMedical_OR,
+                                cpi_emp_data_USMedical_PA,
+                                cpi_emp_data_USMedical_TX,
+                                cpi_emp_data_USMedical_WA,
+                                cpi_emp_data_USMedical_WI)
+
+
+ALL_EDUCATION <- rbind(cpi_emp_data_USEducationAndCommunication_AK,
+                                cpi_emp_data_USEducationAndCommunication_AZ,
+                                cpi_emp_data_USEducationAndCommunication_CA,
+                                cpi_emp_data_USEducationAndCommunication_CO,
+                                cpi_emp_data_USEducationAndCommunication_FL,
+                                cpi_emp_data_USEducationAndCommunication_GA,
+                                cpi_emp_data_USEducationAndCommunication_HI,
+                                cpi_emp_data_USEducationAndCommunication_IL,
+                                cpi_emp_data_USEducationAndCommunication_KS,
+                                cpi_emp_data_USEducationAndCommunication_MA,
+                                cpi_emp_data_USEducationAndCommunication_MI,
+                                cpi_emp_data_USEducationAndCommunication_MN,
+                                cpi_emp_data_USEducationAndCommunication_MO,
+                                cpi_emp_data_USEducationAndCommunication_NY,
+                                cpi_emp_data_USEducationAndCommunication_OH,
+                                cpi_emp_data_USEducationAndCommunication_OR,
+                                cpi_emp_data_USEducationAndCommunication_PA,
+                                cpi_emp_data_USEducationAndCommunication_TX,
+                                cpi_emp_data_USEducationAndCommunication_WA,
+                                cpi_emp_data_USEducationAndCommunication_WI)
+
+
+```
+
 
 ```{r}
 ALL_AK <- rbind(cpi_emp_data_USTransportation_AK,
