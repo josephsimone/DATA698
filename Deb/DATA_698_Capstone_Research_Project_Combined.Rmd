@@ -5928,7 +5928,7 @@ NEW_ALL_WI <- as.data.frame(ALL_MI[,c("Year","Description", "Number of jobs","cp
 
 ```{r}
 h2 <- NEW_ALL_AK %>% filter(Description=="Health care and social assistance")
-h
+h2
 ```
 
 
