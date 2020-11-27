@@ -5569,8 +5569,10 @@ ALL_FB <-rbind(cpi_emp_data_USFoodBeverage_AK,
                                 cpi_emp_data_USFoodBeverage_TX,
                                 cpi_emp_data_USFoodBeverage_WA,
                                 cpi_emp_data_USFoodBeverage_WI)
+```
 
 
+```{r}
 ALL_HOUSING <- rbind( cpi_emp_data_USHousing_AK,
                                 cpi_emp_data_USHousing_AZ,
                                 cpi_emp_data_USHousing_CA,
@@ -5591,7 +5593,10 @@ ALL_HOUSING <- rbind( cpi_emp_data_USHousing_AK,
                                 cpi_emp_data_USHousing_TX,
                                 cpi_emp_data_USHousing_WA,
                                 cpi_emp_data_USHousing_WI)
+```
 
+
+```{r}
 ALL_TRANSPORT <- rbind( cpi_emp_data_USTransportation_AK,
                                 cpi_emp_data_USTransportation_CA,
                                 cpi_emp_data_USTransportation_CO,
@@ -5611,7 +5616,10 @@ ALL_TRANSPORT <- rbind( cpi_emp_data_USTransportation_AK,
                                 cpi_emp_data_USTransportation_TX,
                                 cpi_emp_data_USTransportation_WA,
                                 cpi_emp_data_USTransportation_WI)
+```
 
+
+```{r}
 ALL_MEDICAL <- rbind(  cpi_emp_data_USMedical_AK,
                                 cpi_emp_data_USMedical_AZ,
                                 cpi_emp_data_USMedical_CA,
@@ -5632,8 +5640,10 @@ ALL_MEDICAL <- rbind(  cpi_emp_data_USMedical_AK,
                                 cpi_emp_data_USMedical_TX,
                                 cpi_emp_data_USMedical_WA,
                                 cpi_emp_data_USMedical_WI)
+```
 
 
+```{r}
 ALL_EDUCATION <- rbind(cpi_emp_data_USEducationAndCommunication_AK,
                                 cpi_emp_data_USEducationAndCommunication_AZ,
                                 cpi_emp_data_USEducationAndCommunication_CA,
@@ -5657,6 +5667,202 @@ ALL_EDUCATION <- rbind(cpi_emp_data_USEducationAndCommunication_AK,
 
 
 ```
+
+```{r}
+NEW_ALL_FB <- as.data.frame(ALL_FB[,c("Year","Description", "Number of jobs","cpi_value")])
+```
+
+
+```{r}
+NEW_ALL_HOUSING <- as.data.frame(ALL_HOUSING[,c("Year","Description", "Number of jobs","cpi_value")])
+```
+
+```{r}
+NEW_ALL_TRANSPORT <- as.data.frame(ALL_TRANSPORT[,c("Year","Description", "Number of jobs","cpi_value")])
+```
+
+```{r}
+NEW_ALL_MEDICAL <- as.data.frame(ALL_MEDICAL[,c("Year","Description", "Number of jobs","cpi_value")])
+```
+
+```{r}
+NEW_ALL_EDUCATION <- as.data.frame(ALL_EDUCATION[,c("Year","Description", "Number of jobs","cpi_value")])
+```
+
+
+
+## Food and Beverage Graphs
+
+
+```{r}
+fbg <- NEW_ALL_FB 
+fbg
+```
+
+
+```{r}
+fbg %>% arrange(desc(cpi_value))
+fbg
+```
+
+
+
+```{r}
+library(ggpubr)
+library(gridExtra)
+
+b_fb_1 = fbg %>% select(c("Year","Sector"= "Description","No_Jobs"="Number of jobs")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(No_Jobs)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+  labs(title = "Employement",
+       y = "Sector",x= "Years") 
+
+b_fb_2 = fbg %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(cpi_value)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+  labs(title = "CPI",
+       y = "Sector",x= "Years")
+
+figure_fb <- ggarrange(b_fb_1, b_fb_2, 
+          ncol = 2, nrow = 1)
+
+annotate_figure(figure_fb,
+                top = text_grob("Total Food & Beverage", color = "red", face = "bold", size = 14),
+                bottom = text_grob("Data source: \n BLS", color = "blue",
+                                   hjust = 1, x = 1, face = "italic", size = 10)
+                )
+
+```
+
+## Housing Graph
+
+```{r}
+hg <- NEW_ALL_HOUSING 
+hg
+```
+
+```{r}
+hg %>% arrange(desc(cpi_value))
+hg
+```
+
+
+```{r}
+
+b_h_1 = hg %>% select(c("Year","Sector"= "Description","No_Jobs"="Number of jobs")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(No_Jobs)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+  labs(title = "Employement",
+       y = "Sector",x= "Years") 
+
+b_h_2 = hg %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(cpi_value)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+  labs(title = "CPI",
+       y = "Sector",x= "Years")
+
+figure_h_1 <- ggarrange(b_h_1, b_h_2, 
+          ncol = 2, nrow = 1)
+
+annotate_figure(figure_h_1,
+                top = text_grob("Total Housing", color = "red", face = "bold", size = 14),
+                bottom = text_grob("Data source: \n BLS", color = "blue",
+                                   hjust = 1, x = 1, face = "italic", size = 10)
+                )
+```
+
+## Trasportation Graph
+
+```{r}
+tg <- NEW_ALL_TRANSPORT
+tg
+```
+
+```{r}
+tg %>% arrange(cpi_value)
+tg
+```
+
+
+```{r}
+b_t_1 = tg %>% select(c("Year","Sector"= "Description","No_Jobs"="Number of jobs")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(No_Jobs)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+  labs(title = "Employement",
+       y = "Sector",x= "Years") 
+
+b_t_2 = tg %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(cpi_value)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+  labs(title = "CPI",
+       y = "Sector",x= "Years")
+
+figure_t <- ggarrange(b_t_1, b_t_2, 
+          ncol = 2, nrow = 1)
+
+annotate_figure(figure_t,
+                top = text_grob("Total Transportation", color = "red", face = "bold", size = 14),
+                bottom = text_grob("Data source: \n BLS", color = "blue",
+                                   hjust = 1, x = 1, face = "italic", size = 10)
+                )
+```
+
+## Medical Graphs
+
+
+```{r}
+mg <- NEW_ALL_MEDICAL %>% filter(Description=="Real estate and rental and leasing")
+mg
+```
+
+```{r}
+mg %>% arrange(desc(cpi_value))
+mg
+```
+
+
+```{r}
+
+b_m_1 = mg %>% select(c("Year","Sector"= "Description","No_Jobs"="Number of jobs")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(No_Jobs)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+  labs(title = "Employement",
+       y = "Sector",x= "Years") 
+
+b_m_2 = mg %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(cpi_value)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+  labs(title = "CPI",
+       y = "Sector",x= "Years")
+
+figure_m <- ggarrange(b_m_1, b_m_2, 
+          ncol = 2, nrow = 1)
+
+annotate_figure(figure_m,
+                top = text_grob("Total Medical", color = "red", face = "bold", size = 14),
+                bottom = text_grob("Data source: \n BLS", color = "blue",
+                                   hjust = 1, x = 1, face = "italic", size = 10)
+                )
+```
+
+## Education Graphs
+
+```{r}
+eg <- NEW_ALL_EDUCATION
+eg
+
+
+```
+
+```{r}
+eg %>% arrange(desc(cpi_value))
+eg
+```
+
+
+```{r}
+b_e_1 = eg %>% select(c("Year","Sector"= "Description","No_Jobs"="Number of jobs")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(No_Jobs)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+  labs(title = "Employement",
+       y = "Sector",x= "Years") 
+
+b_e_2 = eg %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(cpi_value)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+  labs(title = "CPI",
+       y = "Sector",x= "Years")
+
+figure_e <- ggarrange(b27, b28, 
+          ncol = 2, nrow = 1)
+
+annotate_figure(figure_e,
+                top = text_grob("Total Education", color = "red", face = "bold", size = 14),
+                bottom = text_grob("Data source: \n BLS", color = "blue",
+                                   hjust = 1, x = 1, face = "italic", size = 10)
+                )
+```
+
 
 
 ```{r}
@@ -6039,11 +6245,11 @@ r2
 
 ```{r}
 
-b25 = r %>% select(c("Year","Sector"= "Description","No_Jobs"="Number of jobs")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(No_Jobs)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+b25 = r2 %>% select(c("Year","Sector"= "Description","No_Jobs"="Number of jobs")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(No_Jobs)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
   labs(title = "Employement",
        y = "Sector",x= "Years") 
 
-b26 = r %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(cpi_value)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
+b26 = r2 %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(mapping = aes(x= Year, y=(as.numeric(cpi_value)))) + geom_col()+    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86)))+
   labs(title = "CPI",
        y = "Sector",x= "Years")
 
