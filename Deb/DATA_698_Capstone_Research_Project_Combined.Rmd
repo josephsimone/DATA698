@@ -5735,14 +5735,6 @@ annotate_figure(figure_fb,
 
 
 
-```{r}
-ggplot(fbg, aes(x = fbg$Year, y = fbg$`Number of jobs`)) +
-  geom_line() +
-  labs(title = "Personal Savings Rate",
-       x = "Date",
-       y = "Personal Savings Rate")
-```
-
 
 
 ```{r}
@@ -5751,19 +5743,6 @@ df <- fbg %>%
   gather(key = "variable", value = "value", -Year)
 head(df, 3)
 ```
-
-```{r}
-ggplot(df, aes(x = Year, y = value)) + 
-  geom_line(aes(color = variable), size = 1) +
-  scale_color_manual(values = c("#00AFBB", "#E7B800")) +
-  theme_minimal()
-```
-
-
-```{r}
-
-```
-
 
 
 
@@ -5983,11 +5962,11 @@ ALL_KS <- rbind(cpi_emp_data_USTransportation_KS,
 ```
 
 ```{r}
-ALL_MA <- rbind(cpi_emp_data_USTransportation_KS,
-       cpi_emp_data_USMedical_KS,
-       cpi_emp_data_USHousing_KS,
-       cpi_emp_data_USFoodBeverage_KS,
-      cpi_emp_data_USEducationAndCommunication_KS)
+ALL_MA <- rbind(cpi_emp_data_USTransportation_MA,
+       cpi_emp_data_USMedical_MA,
+       cpi_emp_data_USHousing_MA,
+       cpi_emp_data_USFoodBeverage_MA,
+      cpi_emp_data_USEducationAndCommunication_MA)
 ```
 
 ```{r}
