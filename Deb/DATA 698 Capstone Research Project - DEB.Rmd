@@ -5803,356 +5803,116 @@ cpi_emp_data_Combined %>%
 
 # Hypothesis Test {.tabset .tabset-fade .tabset-pills}
 
+* Null Hypothesis: CPI Value has no effect on Number of Employment.
+
+$H_o: \mu_1 = \mu_2 = \mu_3...= \mu_n$
+
+* Alternative Hypothesis: CPI Value has effect on Number of Employment.
+
+$H_a \neq Ho: \mu_1 \neq \mu_2 \neq \mu_3...\neq \mu_n$
+
+* Rejection : Reject $H_o$ (Null Hypothesis) if the calculated value (P-Value) is less than the tabulated value(Table value = 0.05 ), otherwise do not reject $H_o$
+
+**Decision**
+
+We can reject Null Hypothesis ($H_o$) since P-Values are all less than Tabulated value of 0.05 and accept the Alternate Hypothesis.
+
+## F-Test
+```{r, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+library(car)
+leveneTest(cpi_emp_data_Combined$cpi_value ~ cpi_emp_data_Combined$No_Jobs)
+#oneway.test(formula = cpi_value ~ No_Jobs, data = cpi_emp_data_Combined, var.equal = T) 
+```
+
+## Step-Test
+
+Using both forward and backward model selection to select the best model for our analysis.
+
+```{r, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+fit_labor <-  glm(cpi_value ~ No_Jobs, family=poisson(link='log'), data=cpi_emp_data_Combined)
+summary(stepwise <- step(fit_labor, direction = "both")) 
+```
+
+**Plot of Residuals**
+
+```{r, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+residual_labor = data.frame(Fitted = fitted(stepwise),
+Residuals = resid(stepwise), Treatment = cpi_emp_data_Combined$No_Jobs)
+
+library(plotly)
+plot_res <- ggplot(residual_labor, aes(Fitted, Residuals, colour = Treatment)) + geom_point()
+ggplotly(plot_res)
+```
+
+**Analysis of Variance (ANOVA of Employment)**
+
+```{r, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+anova(stepwise, test="F")
+```
+
 ## ANOVA Tests
-```{r, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+```{r, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 ### Generlaized Linear regression Model
 ###anova(model_glm, test = 'Chisq')
 
 ###One way ANOVA
 anova_one_way <- aov(formula = cpi_value ~ No_Jobs, data = cpi_emp_data_Combined)
 summary(anova_one_way)
+#plot(anova_one_way, 2)
+
+anova_other_way <- aov(formula = No_Jobs ~ cpi_value, data = cpi_emp_data_Combined)
+summary(anova_other_way)
+#plot(anova_other_way, 2)
 
 ###Pairwise ANOVA
-tuk <- TukeyHSD(anova_one_way)
-plot(tuk, las = 1)
+tuk <- TukeyHSD(anova_one_way, conf.level = 0.95)
+tuk
+#plot(tuk, las = 1)
 
 ###Two way ANOVA
-anova_two_way_plot <- ggplot(cpi_emp_data_Combined, aes(x = cpi_value, y = No_Jobs, group=industry)) + 
-  geom_point(cex = 1.5, pch = 1.0,position = position_jitter(w = 0.1, h = 0)) 
-anova_two_way_plot
+#anova_two_way_plot <- ggplot(cpi_emp_data_Combined, aes(x = cpi_value, y = No_Jobs, group=industry)) + 
+#  geom_point(cex = 1.5, pch = 1.0,position = position_jitter(w = 0.1, h = 0)) +
+#  labs(title = "2-way ANOVA")
+#anova_two_way_plot
 ```
+We can reject the null hypothesis at the ?? = 0.01 significance level (95% confidence). 
 
 ## T-Test
-
-```{r, include=TRUE, eval=FALSE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
-ggplot(cpi_emp_data_Combined) +
-  aes(x = paste0(state, '-', industry), y = cpi_value) +
-  geom_boxplot() +
-  theme_minimal() + 
-  theme(axis.text.x=element_text(size=5, angle=90)) + 
-  labs(title = "T-Test",
-       y = "CPI", 
-       x  = "State-Industry", 
-       fill = "State", 
-       subtitle = "CPI vs State-Industry", 
-       caption = "Source: Employment from Select Industry by State")
-  coord_flip()
-
+```{r, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 #test <- t.test(cpi_emp_data_Combined$No_Jobs, 
 #               cpi_emp_data_Combined$cpi_value,
 #               alternative = "two.sided", 
 #               var.equal = FALSE)
 #paste("p-value", test$p.value)
- 
-ggplot(cpi_emp_data_Combined) +
-  aes(x = No_Jobs, y = cpi_value ) +
-  geom_boxplot() +
-  theme_minimal() + 
-  theme(axis.text.x=element_text(size=5, angle=90)) + 
-  labs(title = "T-Test",
-       y = "CPI", 
-       x  = "Number of jobs", 
-       fill = "State", 
-       subtitle = "Number of jobs vs CPI", 
-       caption = "Source: Employment from Select Industry by State")
-  coord_flip()
 
 ### Partial Least Squares regression model
 ###anova(model_pls, test = 'Chisq')
 
 library(multcomp)
-# summary(glht(anova_one_way, linfct = mcp(cpi_value = "Tukey")))
+# summary(glht(anova_one_way, linfct = mcp(cpi_value = "Tukey")))http://127.0.0.1:19984/rmd_output/4/#anova-tests
 pairwise.t.test(cpi_emp_data_Combined$No_Jobs, cpi_emp_data_Combined$cpi_value,
                  p.adjust.method = "BH")
 ```
 
 ## Chi-Squared Test
-```{r, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+```{r, eval=TRUE, include=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 ### Linear Regression Model
 ###anova(lm, test = 'Chisq')
 
 test <- chisq.test(table(cpi_emp_data_Combined$cpi_value, cpi_emp_data_Combined$No_Jobs))
 test
 
-library(vcd)
-mosaic(cpi_value ~ No_Jobs,
-       direction = c("v", "h"),
-       data = cpi_emp_data_Combined,
-       shade = TRUE)
+#library(vcd)
+#mosaic(cpi_value ~ No_Jobs,
+#       direction = c("v", "h"),
+#       data = cpi_emp_data_Combined,
+#       shade = TRUE)
 
-library("graphics")
-cpi_emp_data_Combined %>%
-  select(Year,industry,state,cpi_value,No_Jobs) %>%
-  mosaicplot(shade = TRUE, las=2,
-             main = "CPI vs No Of Jobs")
-```
-
-# RAJWANT WORK
-```{r}
-cpi_emp_data_USFoodBeverage_NY %>% 
-    select(c("Year","Sector"= "Description","No_Jobs","cpi_value")) %>%   
-    gather(key="Type", value ="Value", "cpi_value","No_Jobs") %>% 
-    ggplot(mapping = aes(x= Year, y=(as.numeric(Value)),fill = Type,group = Type)) + 
-    geom_col(position = position_dodge()) + geom_smooth(method = "lm")
-    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86))) +
-    labs(title = "USSFoodBeverage Data for No. Of Jobs and CPI Value in NY",
-         y="Sector", x="Years") 
-
-cpi_emp_data_USFoodBeverage_NY %>% 
-    select(c("Year","Sector"= "Description","No_Jobs")) %>% 
-    ggplot(mapping = aes(x= Year, y=(as.numeric(No_Jobs)))) + 
-    geom_col() + 
-    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86))) +
-    labs(title = "USSFoodBeverage Data for No. Of Jobs  in NY",
-         y="Sector", x="Years") 
-
-cpi_emp_data_USFoodBeverage_NY %>% 
-    select(c("Year","Sector"= "Description","cpi_value")) %>% 
-    ggplot(mapping = aes(x= Year, y=(as.numeric(cpi_value)))) + 
-    geom_col() + 
-    theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86))) +
-    labs(title = "USSFoodBeverage Data for CPI Value in NY",
-         y = "Sector",x= "Years") 
-
-# summary(as.numeric(cpi_emp_data_USFoodBeverage_NY$`Number of jobs`))
-# summary(as.numeric(cpi_emp_data_USFoodBeverage_NY$cpi_value))
-# 
-# quantile(as.numeric(cpi_emp_data_USFoodBeverage_NY$`Number of jobs`))
-# levels(quantile(as.numeric(cpi_emp_data_USFoodBeverage_NY$cpi_value)))
-```
-
-## Model
-```{r}
-#library(DataExplorer)
-#library(plot_histogram)
-library(lazytrade)
-
-ALL_NY <- rbind(cpi_emp_data_USTransportation_NY,
-                cpi_emp_data_USMedical_NY,
-                cpi_emp_data_USHousing_NY,
-                cpi_emp_data_USFoodBeverage_NY,
-                cpi_emp_data_USEducationAndCommunication_NY)
-
-#DataExplorer::plot_missing(ALL_NY, title = "Beverage Training Data: % Missing Values by Data Element")
-
-ALL_NY$No_Jobs = as.numeric(ALL_NY$No_Jobs)
-#plot_histogram(ALL_NY, ggtheme=theme_light())
-#plot_correlation(ALL_NY[,c(2,5,9)])
-
-ggplot(ALL_NY[,c("Year","Description","No_Jobs","cpi_value")], 
-        mapping=aes(y= log(cpi_value), 
-        x=Year,
-        color= Description, 
-        group = Description)) + geom_smooth() + theme_classic()
-
-ggplot(ALL_NY[,c("Year","Description","Number of jobs","cpi_value")], 
-        mapping=aes(y= log(`Number of jobs`), 
-        x=Year,
-        color= Description, 
-        group = Description)) + geom_smooth() + theme_classic()
-```
-
-```{r}
-ALL_NY
-
-ALL_NY_M <- ALL_NY[,c("Year","Number of jobs","parent_item_code","cpi_value")]
-names(ALL_NY_M) = c("Year", "Jobs", "C_Item","CPI")
-
-# ALL_NY_M$Year = as.character(ALL_NY_M$Year)
-# ALL_NY_M$E_Area = as.character(ALL_NY_M$E_Area)
-library(caret)
-set.seed(3456)
-trainIndex <- createDataPartition(ALL_NY_M$Jobs, p = .8, 
-                                  list = FALSE, 
-                                  times = 1)
-ALL_NY_train <- ALL_NY_M[ trainIndex,]
-ALL_NY_test  <- ALL_NY_M[-trainIndex,]
-
-head(ALL_NY_M)
-```
-
-```{r}
-metric = 'RMSE'
-head(ALL_NY_train )
-
-# Train control
-customTrainControl <- trainControl(method = "repeatedcv", 
-                                   number = 10 , 
-                                   repeats = 5 ,
-                                   verboseIter = F)
-
-# Linear Model
-lm <- train(Jobs ~ .,
-            ALL_NY_train,
-            method= 'lm',
-            trControl = customTrainControl)
-lm$results
-
-summary(lm)
-par(mfrow=c(2,2))
-plot(lm$finalModel)
-
-#--------------
-# https://stackoverflow.com/questions/44200195/how-to-debug-contrasts-can-be-applied-only-to-factors-with-2-or-more-levels-er
-ALL_NY_train %>% dplyr::mutate_all(as.factor) %>% str
-
-unique(ALL_NY$area_code)
-
-# multiple LM
-lm_cpi_item <- lm(Jobs ~ CPI+C_Item,ALL_NY_train)
-summary(lm_cpi_item)
-
-lm_cpi2_item <- lm(Jobs ~ (CPI^2)+C_Item,ALL_NY_train)
-summary(lm_cpi2_item)
-
-lm_cpi_year <- lm(Jobs ~ CPI+Year,ALL_NY_train)
-summary(lm_cpi_year)
-
-xyplot(ALL_NY_test$Jobs ~ predict(lm),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_test$Jobs ~ predict(lm_cpi_year),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(resid(lm_cpi_year) ~ predict(lm_cpi_year),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-
-#PLS
-# Useing train perform  to perfrom  pre-process and tuning together. The function first preprocess the training set by centering it and scaling it. Then the function uses 10-fold cross validation to try the number of components, i.e. latent variables, of the PLS model from 1 to 20.
-# # The train function generates a resampling estimate of performance. Because
-# the training set size is not small, 10-fold cross-validation should produce
-# reasonable estimates of model performance. The function trainControl specifies
-# the type of resampling:
-ctrl <- trainControl(method = "cv", number = 10)
-
-model_pls<- train(Jobs ~ .,   ALL_NY_train,
-                     method = "pls",
-                     tuneLength = 20,
-                     metric='Rsquared',
-                     trControl = ctrl,
-                     preProc = c("center", "scale"))
-model_pls
-
-model_pls$results[3,2:4]
-
-# M
-model_glm<- train(Jobs ~ .,   ALL_NY_train,
-                     method = "glm",
-                     tuneLength = 20,
-                     metric='Rsquared',
-                     trControl = ctrl,
-                     preProc = c("center", "scale"))
-model_glm
-```
-
-```{r , include=TRUE, eval=FALSE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
-test_model(test_dataset = model_pls,
-           predictor_dataset = ALL_NY_train,
-           test_type = "regression")
-
-# TEST MODEL with Train  data
-xyplot(ALL_NY_train$Jobs ~ predict(model_pls),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_train$Jobs ~ predict(lm),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_train$Jobs ~ predict(lm_cpi2_item),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_train$Jobs ~ predict(lm_cpi_item),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_train$Jobs ~ predict(model_glm),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-# TEST MODEL with TEst data
-xyplot(ALL_NY_test$Jobs ~ predict(model_pls,ALL_NY_test),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_test$Jobs ~ predict(lm,ALL_NY_test),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-xyplot(ALL_NY_test$Jobs ~ predict(lm_cpi_item,ALL_NY_test),
- ## plot the points (type = 'p') and a background grid ('g')
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Observed")
-
-# REssidual Plot with train data
-xyplot(resid(model_pls) ~ predict(model_pls),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
- 
-xyplot(resid(lm) ~ predict(lm),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-
-xyplot(resid(lm_cpi_item) ~ predict(lm_cpi_item),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-    
-xyplot(resid(lm_cpi2_item) ~ predict(lm_cpi2_item),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-
-xyplot(resid(lm_cpi2_item) ~ predict(lm_cpi2_item),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-      
-# REssidual Plot with Test data
-xyplot(resid(model_pls) ~ predict(model_pls,ALL_NY_test),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
- 
-xyplot(resid(model_glm) ~ predict(model_glm,ALL_NY_test),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-  
-xyplot(resid(lm_cpi_item) ~ predict(lm_cpi_item,ALL_NY_test),
- type = c("p", "g"),
- xlab = "Predicted", ylab = "Residuals")
-    
-data.frame("LM Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm, ALL_NY_test))),
-           "MAPE" =  MLmetrics::MAPE(predict(lm, ALL_NY_test),ALL_NY_test$Jobs))
-data.frame("lm_cpi2_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi2_item, ALL_NY_test))),
-           "MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs))
-data.frame("lm_cpi_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_item, ALL_NY_test))),
-           "MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs))
-data.frame("lm_cpi_year Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_year, ALL_NY_test))),
-           "MAPE" =  MLmetrics::MAPE(predict(lm_cpi_year, ALL_NY_test),ALL_NY_test$Jobs))
-data.frame("PLS Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(model_pls, ALL_NY_test))),
-           "MAPE" =  MLmetrics::MAPE(predict(model_pls, ALL_NY_test),ALL_NY_test$Jobs))
-
-cbind(data.frame("LM Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm, ALL_NY_test))),
-                 "MAPE" =  MLmetrics::MAPE(predict(lm, ALL_NY_test),ALL_NY_test$Jobs)),
-      data.frame("lm_cpi2_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi2_item, ALL_NY_test))),
-                 "MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs)),
-      data.frame("lm_cpi_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_item, ALL_NY_test))),
-                 "MAPE" =  MLmetrics::MAPE(predict(lm_cpi2_item, ALL_NY_test),ALL_NY_test$Jobs)),
-      data.frame("lm_cpi_year Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi_year, ALL_NY_test))),
-                 "MAPE" =  MLmetrics::MAPE(predict(lm_cpi_year, ALL_NY_test),ALL_NY_test$Jobs)),
-      data.frame("PLS Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(model_pls, ALL_NY_test))),
-                 "MAPE" =  MLmetrics::MAPE(predict(model_pls, ALL_NY_test),ALL_NY_test$Jobs))
-    )
+#library("graphics")
+#cpi_emp_data_Combined %>%
+#  select(Year,industry,state,cpi_value,No_Jobs) %>%
+#  mosaicplot(shade = TRUE, las=2,
+#             main = "CPI vs No Of Jobs")
 ```
 
 # References
