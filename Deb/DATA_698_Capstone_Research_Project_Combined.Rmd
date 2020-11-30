@@ -44,21 +44,23 @@ Load the required libraries
 #install.packages (packages, repos="http://cran.us.r-project.org", dependencies=TRUE, lib="C:/Program Files/R/R-3.6.3/library")
 #invisible (lapply (packages, library, character.only = T))
 #devtools::install_github("hadley/ggplot2")
+
 #if (!require(devtools)) install.packages("devtools", repos="http://cran.us.r-project.org", dependencies=TRUE, lib="C:/Program Files/R/R-3.6.3/library")
 #devtools::install_github("boxuancui/DataExplorer")
 #library("DataExplorer", lib.loc="C:/Program Files/R/R-3.6.3/library")
+
 library(tidyverse)
 library(kableExtra)
 library(lubridate)
 library(forecast)
 library(stringi)
 library(dplyr)
-library(ggplot2)
 ```
 
 ## Load Employment Datasets
 ```{r load-sainc-files, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 file_path <- "../data/cpi/SAINC/"
+
 EMP_DATA_FILE <- paste0(file_path,"EMP9818.csv")
 EMP_DATA <- read_delim(EMP_DATA_FILE, delim = ",", col_names = TRUE, trim_ws= TRUE) 
 #,skip = 6,col_types = list(col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character(),col_character()))
@@ -70,6 +72,7 @@ EMP_DATA <- read_delim(EMP_DATA_FILE, delim = ",", col_names = TRUE, trim_ws= TR
 # head(SAP_INV_DAT)
 summary(EMP_DATA)
 DT::datatable(EMP_DATA)
+
 # Reading the Category and detail Desc for ref.
 EMP_DEF_FILE <- paste0(file_path,"SAEMP25N__definition.xml")
 IND_DESC <- XML::xmlToDataFrame(EMP_DEF_FILE)
@@ -89,17 +92,20 @@ EMAP_CAT_LAST <- EMP_DATA[,c(2,5,6,7)] %>%
                   filter(ISML %in% c("L","N")) %>%  
                   select(.,LineCode,Description)
 #DT::datatable(EMAP_CAT_LAST)
+
 EMP_DAT_CAT <- EMP_DATA[,c(2,5,9:29)] %>% 
                 left_join(EMAP_CAT_LAST,.,by="LineCode")
 glimpse(EMP_DAT_CAT)
 head(EMP_DAT_CAT,130)
 #DT::datatable(EMP_DAT_CAT)
+
 temp_name <- names(EMP_DAT_CAT [,c(4:24)])
 EMP_DAT_CAT_SAN <-  data.frame(lapply(EMP_DAT_CAT [,c(4:24)],function(x) {
                       gsub("(D)|(T)",NA,x)
                     })) 
 names(EMP_DAT_CAT_SAN) = temp_name
 #DT::datatable(EMP_DAT_CAT_SAN)
+
 EMP_DAT_CAT_SAN <- cbind(EMP_DAT_CAT[,c(1:3)],EMP_DAT_CAT_SAN)
 #DT::datatable(EMP_DAT_CAT_SAN)
 ```
@@ -115,6 +121,7 @@ EMP_DAT_CAT_SAN_AK <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_AK %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -129,6 +136,7 @@ EMP_DAT_CAT_SAN_AZ <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_AZ %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -143,6 +151,7 @@ EMP_DAT_CAT_SAN_CA <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_CA %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -157,6 +166,7 @@ EMP_DAT_CAT_SAN_CO <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_CO %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -171,6 +181,7 @@ EMP_DAT_CAT_SAN_FL <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_FL %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -185,6 +196,7 @@ EMP_DAT_CAT_SAN_GA <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_GA %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -199,6 +211,7 @@ EMP_DAT_CAT_SAN_HI <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_HI %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -213,6 +226,7 @@ EMP_DAT_CAT_SAN_IL <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_IL %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -227,6 +241,7 @@ EMP_DAT_CAT_SAN_KS <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_KS %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -241,6 +256,7 @@ EMP_DAT_CAT_SAN_MA <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_MA %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -255,6 +271,7 @@ EMP_DAT_CAT_SAN_MI <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_MI %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -269,6 +286,7 @@ EMP_DAT_CAT_SAN_MN <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_MN %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -283,6 +301,7 @@ EMP_DAT_CAT_SAN_MO <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_MO %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -297,6 +316,7 @@ EMP_DAT_CAT_SAN_NY <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_NY %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -311,6 +331,7 @@ EMP_DAT_CAT_SAN_OH <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_OH %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -325,6 +346,7 @@ EMP_DAT_CAT_SAN_OR <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_OR %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -339,6 +361,7 @@ EMP_DAT_CAT_SAN_PA <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_PA %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -353,6 +376,7 @@ EMP_DAT_CAT_SAN_TX <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_TX %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -367,6 +391,7 @@ EMP_DAT_CAT_SAN_WA <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_WA %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -381,6 +406,7 @@ EMP_DAT_CAT_SAN_WI <- EMP_DAT_CAT_SAN %>%
                           id.vars = c("LineCode","Description","GeoName"), 
                           variable.name = "Year", 
                           value.name = "Number of jobs")
+
 EMP_DAT_CAT_SAN_WI %>%
   #sample_frac(0.33) %>% 
   DT::datatable()
@@ -390,11 +416,13 @@ EMP_DAT_CAT_SAN_WI %>%
 
 ```{r load-cu-files, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 file_path <- "../data/cpi/archive/"
+
 ### Read files named *.csv
 filenames <- list.files(path=file_path,
                         pattern="*.csv",
                         full.names = TRUE)
 ###print(filenames)
+
 ###Create list of data frame names without the ".csv" part 
 names <- gsub(pattern='\\.', 
               replacement='_', # remove the last 4 characters from filename (_clean)
@@ -404,6 +432,7 @@ names <- gsub(pattern='\\.',
                  )
               )
 ###print(names)
+
 ###Load all files
 for(i in filenames){
   ## Create list of data frame names without the ".csv" part 
@@ -459,12 +488,14 @@ cu_reference_data = cu_series %>%
                     inner_join(cu_item, by="item_code") %>% 
                     inner_join(cu_periodicity, by="periodicity_code") %>% 
                     inner_join(cu_base, by="base_code")
+
 colnames(cu_reference_data)[which(names(cu_reference_data) == "display_level.x")] <- "area_display_level"
 colnames(cu_reference_data)[which(names(cu_reference_data) == "selectable.x")] <- "area_selectable"
 colnames(cu_reference_data)[which(names(cu_reference_data) == "sort_sequence.x")] <- "area_sort_sequence"
 colnames(cu_reference_data)[which(names(cu_reference_data) == "display_level.y")] <- "item_display_level"
 colnames(cu_reference_data)[which(names(cu_reference_data) == "selectable.y")] <- "item_selectable"
 colnames(cu_reference_data)[which(names(cu_reference_data) == "sort_sequence.y")] <- "item_sort_sequence"
+
 cu_reference_data <- cu_reference_data[c("series_id",
                                          "series_title",
                                          "area_code",
@@ -494,6 +525,7 @@ FoodItemCode <- cu_reference_data %>%
                     filter(grepl('SAF|SEF|SS0|SS1|SS20', item_code))
                     #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
 #DT::datatable((FoodItemCode))
+
 cu_data_USFoodBeverage = cu_data_0_Current %>% 
                               inner_join(FoodItemCode, by="series_id") %>% 
                               inner_join(cu_period, by="period") %>% 
@@ -531,6 +563,7 @@ HousingItemCode <- cu_reference_data %>%
                     filter(grepl('SAH|SEH', item_code))
                     #dplyr::filter(item_code %like% 'SAH' | item_code %like% 'SEH')
 #DT::datatable((HousingItemCode))
+
 cu_data_USHousing = cu_data_0_Current %>% 
                               inner_join(HousingItemCode, by="series_id") %>% 
                               inner_join(cu_period, by="period") %>% 
@@ -566,6 +599,7 @@ DT::datatable(head(cu_data_USHousing))
 ```{r USTransportation, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 TransportItemCode <- cu_reference_data %>%
                     filter(grepl('SAT|SET|SS4|SS52|SS53|SAS24|SAS4', item_code))
+
 cu_data_USTransportation = cu_data_0_Current %>% 
                               inner_join(TransportItemCode, by="series_id") %>% 
                               inner_join(cu_period, by="period") %>% 
@@ -600,6 +634,7 @@ DT::datatable(head(cu_data_USTransportation))
 ```{r USMedical, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 MedicalItemCode <- cu_reference_data %>%
                     filter(grepl('SAM|SEM|SS57', item_code))
+
 cu_data_USMedical = cu_data_0_Current %>% 
                               inner_join(MedicalItemCode, by="series_id") %>% 
                               inner_join(cu_period, by="period") %>% 
@@ -634,6 +669,7 @@ DT::datatable(head(cu_data_USMedical))
 ```{r USEducationAndCommunication, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
 EducationItemCode <- cu_reference_data %>%
                     filter(grepl('SAE|SEE|SSE|SS27', item_code))
+
 cu_data_USEducationAndCommunication = cu_data_0_Current %>% 
                                         inner_join(EducationItemCode, by="series_id") %>% 
                                         inner_join(cu_period, by="period") %>% 
@@ -706,8 +742,10 @@ cu_emp_data_USFoodBeverage_AK = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_AK = merge(EMP_DAT_CAT_SAN_AK, cu_emp_data_USFoodBeverage_AK, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_AK %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -751,8 +789,10 @@ cu_emp_data_USFoodBeverage_AZ = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_AZ = merge(EMP_DAT_CAT_SAN_AZ, cu_emp_data_USFoodBeverage_AZ, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_AZ %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -808,8 +848,10 @@ cu_emp_data_USFoodBeverage_CA = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value/3),2))
+
 cpi_emp_data_USFoodBeverage_CA = merge(EMP_DAT_CAT_SAN_CA, cu_emp_data_USFoodBeverage_CA, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_CA %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -853,8 +895,10 @@ cu_emp_data_USFoodBeverage_CO = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_CO = merge(EMP_DAT_CAT_SAN_CO, cu_emp_data_USFoodBeverage_CO, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_CO %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -909,8 +953,10 @@ cu_emp_data_USFoodBeverage_FL = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USFoodBeverage_FL = merge(EMP_DAT_CAT_SAN_FL, cu_emp_data_USFoodBeverage_FL, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_FL %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -956,8 +1002,10 @@ cu_emp_data_USFoodBeverage_GA = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_GA = merge(EMP_DAT_CAT_SAN_GA, cu_emp_data_USFoodBeverage_GA, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_GA %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1003,8 +1051,10 @@ cu_emp_data_USFoodBeverage_HI = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_HI = merge(EMP_DAT_CAT_SAN_HI, cu_emp_data_USFoodBeverage_HI, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_HI %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1050,8 +1100,10 @@ cu_emp_data_USFoodBeverage_IL = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_IL = merge(EMP_DAT_CAT_SAN_IL, cu_emp_data_USFoodBeverage_IL, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_IL %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1097,8 +1149,10 @@ cu_emp_data_USFoodBeverage_KS = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_KS = merge(EMP_DAT_CAT_SAN_KS, cu_emp_data_USFoodBeverage_KS, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_KS %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1142,8 +1196,10 @@ cu_emp_data_USFoodBeverage_MA = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_MA = merge(EMP_DAT_CAT_SAN_MA, cu_emp_data_USFoodBeverage_MA, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_MA %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1187,8 +1243,10 @@ cu_emp_data_USFoodBeverage_MI = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_MI = merge(EMP_DAT_CAT_SAN_MI, cu_emp_data_USFoodBeverage_MI, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_MI %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1232,8 +1290,10 @@ cu_emp_data_USFoodBeverage_MN = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_MN = merge(EMP_DAT_CAT_SAN_MN, cu_emp_data_USFoodBeverage_MN, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_MN %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1277,8 +1337,10 @@ cu_emp_data_USFoodBeverage_MO = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_MO = merge(EMP_DAT_CAT_SAN_MO, cu_emp_data_USFoodBeverage_MO, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_MO %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1322,8 +1384,10 @@ cu_emp_data_USFoodBeverage_NY = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USFoodBeverage_NY, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_NY %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1378,8 +1442,10 @@ cu_emp_data_USFoodBeverage_OH = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USFoodBeverage_OH = merge(EMP_DAT_CAT_SAN_OH, cu_emp_data_USFoodBeverage_OH, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_OH %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1423,8 +1489,10 @@ cu_emp_data_USFoodBeverage_OR = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_OR = merge(EMP_DAT_CAT_SAN_OR, cu_emp_data_USFoodBeverage_OR, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_OR %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1479,8 +1547,10 @@ cu_emp_data_USFoodBeverage_PA = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USFoodBeverage_PA = merge(EMP_DAT_CAT_SAN_PA, cu_emp_data_USFoodBeverage_PA, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_PA %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1529,8 +1599,10 @@ cu_emp_data_USFoodBeverage_TX = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USFoodBeverage_TX = merge(EMP_DAT_CAT_SAN_TX, cu_emp_data_USFoodBeverage_TX, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_TX %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1574,8 +1646,10 @@ cu_emp_data_USFoodBeverage_WA = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_WA = merge(EMP_DAT_CAT_SAN_WA, cu_emp_data_USFoodBeverage_WA, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_WA %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1619,8 +1693,10 @@ cu_emp_data_USFoodBeverage_WI = cu_data_USFoodBeverage %>%
                                             "base_period")) %>% 
                                   group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                   summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USFoodBeverage_WI = merge(EMP_DAT_CAT_SAN_WI, cu_emp_data_USFoodBeverage_WI, 
                                        by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USFoodBeverage_WI %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -1666,8 +1742,10 @@ cu_emp_data_USHousing_AK = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_AK = merge(EMP_DAT_CAT_SAN_AK, cu_emp_data_USHousing_AK, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_AK %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -1711,8 +1789,10 @@ cu_emp_data_USHousing_AZ = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_AZ = merge(EMP_DAT_CAT_SAN_AZ, cu_emp_data_USHousing_AZ, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_AZ %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -1768,8 +1848,10 @@ cu_emp_data_USHousing_CA = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value/3),2))
+
 cpi_emp_data_USHousing_CA = merge(EMP_DAT_CAT_SAN_CA, cu_emp_data_USHousing_CA, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_CA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -1813,8 +1895,10 @@ cu_emp_data_USHousing_CO = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_CO = merge(EMP_DAT_CAT_SAN_CO, cu_emp_data_USHousing_CO, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_CO %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -1869,8 +1953,10 @@ cu_emp_data_USHousing_FL = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USHousing_FL = merge(EMP_DAT_CAT_SAN_FL, cu_emp_data_USHousing_FL, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_FL %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -1914,8 +2000,10 @@ cu_emp_data_USHousing_GA = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_GA = merge(EMP_DAT_CAT_SAN_GA, cu_emp_data_USHousing_GA, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_GA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -1959,8 +2047,10 @@ cu_emp_data_USHousing_HI = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_HI = merge(EMP_DAT_CAT_SAN_HI, cu_emp_data_USHousing_HI, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_HI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2004,8 +2094,10 @@ cu_emp_data_USHousing_IL = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_IL = merge(EMP_DAT_CAT_SAN_IL, cu_emp_data_USHousing_IL, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_IL %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2049,8 +2141,10 @@ cu_emp_data_USHousing_KS = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_KS = merge(EMP_DAT_CAT_SAN_KS, cu_emp_data_USHousing_KS, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_KS %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2094,8 +2188,10 @@ cu_emp_data_USHousing_MA = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_MA = merge(EMP_DAT_CAT_SAN_MA, cu_emp_data_USHousing_MA, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_MA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2139,8 +2235,10 @@ cu_emp_data_USHousing_MI = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_MI = merge(EMP_DAT_CAT_SAN_MI, cu_emp_data_USHousing_MI, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_MI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2184,8 +2282,10 @@ cu_emp_data_USHousing_MN = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_MN = merge(EMP_DAT_CAT_SAN_MN, cu_emp_data_USHousing_MN, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_MN %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2229,8 +2329,10 @@ cu_emp_data_USHousing_MO = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_MO = merge(EMP_DAT_CAT_SAN_MO, cu_emp_data_USHousing_MO, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_MO %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2274,8 +2376,10 @@ cu_emp_data_USHousing_NY = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USHousing_NY, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_NY %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2330,8 +2434,10 @@ cu_emp_data_USHousing_OH = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USHousing_OH = merge(EMP_DAT_CAT_SAN_OH, cu_emp_data_USHousing_OH, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_OH %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2375,8 +2481,10 @@ cu_emp_data_USHousing_OR = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_OR = merge(EMP_DAT_CAT_SAN_OR, cu_emp_data_USHousing_OR, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_OR %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2431,8 +2539,10 @@ cu_emp_data_USHousing_PA = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USHousing_PA = merge(EMP_DAT_CAT_SAN_PA, cu_emp_data_USHousing_PA, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_PA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2481,8 +2591,10 @@ cu_emp_data_USHousing_TX = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USHousing_TX = merge(EMP_DAT_CAT_SAN_TX, cu_emp_data_USHousing_TX, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_TX %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2526,8 +2638,10 @@ cu_emp_data_USHousing_WA = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_WA = merge(EMP_DAT_CAT_SAN_WA, cu_emp_data_USHousing_WA, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_WA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2571,8 +2685,10 @@ cu_emp_data_USHousing_WI = cu_data_USHousing  %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USHousing_WI = merge(EMP_DAT_CAT_SAN_WI, cu_emp_data_USHousing_WI, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USHousing_WI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2618,8 +2734,10 @@ cu_emp_data_USTransportation_AK = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_AK = merge(EMP_DAT_CAT_SAN_AK, cu_emp_data_USTransportation_AK, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_AK %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2663,8 +2781,10 @@ cu_emp_data_USTransportation_AZ = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_AZ = merge(EMP_DAT_CAT_SAN_AZ, cu_emp_data_USTransportation_AZ, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_AZ %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2720,8 +2840,10 @@ cu_emp_data_USTransportation_CA = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value/3),2))
+
 cpi_emp_data_USTransportation_CA = merge(EMP_DAT_CAT_SAN_CA, cu_emp_data_USTransportation_CA, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_CA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2765,8 +2887,10 @@ cu_emp_data_USTransportation_CO = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_CO = merge(EMP_DAT_CAT_SAN_CO, cu_emp_data_USTransportation_CO, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_CO %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2821,8 +2945,10 @@ cu_emp_data_USTransportation_FL = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USTransportation_FL = merge(EMP_DAT_CAT_SAN_FL, cu_emp_data_USTransportation_FL, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_FL %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2866,8 +2992,10 @@ cu_emp_data_USTransportation_GA = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_GA = merge(EMP_DAT_CAT_SAN_GA, cu_emp_data_USTransportation_GA, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_GA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2911,8 +3039,10 @@ cu_emp_data_USTransportation_HI = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_HI = merge(EMP_DAT_CAT_SAN_HI, cu_emp_data_USTransportation_HI, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_HI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -2956,8 +3086,10 @@ cu_emp_data_USTransportation_IL = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_IL = merge(EMP_DAT_CAT_SAN_IL, cu_emp_data_USTransportation_IL, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_IL %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3001,8 +3133,10 @@ cu_emp_data_USTransportation_KS = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_KS = merge(EMP_DAT_CAT_SAN_KS, cu_emp_data_USTransportation_KS, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_KS %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3046,8 +3180,10 @@ cu_emp_data_USTransportation_MA = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_MA = merge(EMP_DAT_CAT_SAN_MA, cu_emp_data_USTransportation_MA, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_MA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3091,8 +3227,10 @@ cu_emp_data_USTransportation_MI = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_MI = merge(EMP_DAT_CAT_SAN_MI, cu_emp_data_USTransportation_MI, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_MI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3136,8 +3274,10 @@ cu_emp_data_USTransportation_MN = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_MN = merge(EMP_DAT_CAT_SAN_MN, cu_emp_data_USTransportation_MN, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_MN %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3181,8 +3321,10 @@ cu_emp_data_USTransportation_MO = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_MO = merge(EMP_DAT_CAT_SAN_MO, cu_emp_data_USTransportation_MO, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_MO %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3226,8 +3368,10 @@ cu_emp_data_USTransportation_NY = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USTransportation_NY, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_NY %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3282,8 +3426,10 @@ cu_emp_data_USTransportation_OH = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USTransportation_OH = merge(EMP_DAT_CAT_SAN_OH, cu_emp_data_USTransportation_OH, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_OH %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3327,8 +3473,10 @@ cu_emp_data_USTransportation_OR = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_OR = merge(EMP_DAT_CAT_SAN_OR, cu_emp_data_USTransportation_OR, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_OR %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3383,8 +3531,10 @@ cu_emp_data_USTransportation_PA = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USTransportation_PA = merge(EMP_DAT_CAT_SAN_PA, cu_emp_data_USTransportation_PA, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_PA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3433,8 +3583,10 @@ cu_emp_data_USTransportation_TX = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USTransportation_TX = merge(EMP_DAT_CAT_SAN_TX, cu_emp_data_USTransportation_TX, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_TX %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3478,8 +3630,10 @@ cu_emp_data_USTransportation_WA = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_WA = merge(EMP_DAT_CAT_SAN_WA, cu_emp_data_USTransportation_WA, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_WA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3523,8 +3677,10 @@ cu_emp_data_USTransportation_WI = cu_data_USTransportation %>%
                                              "base_period")) %>% 
                                     group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                     summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USTransportation_WI = merge(EMP_DAT_CAT_SAN_WI, cu_emp_data_USTransportation_WI, 
                                          by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USTransportation_WI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3570,8 +3726,10 @@ cu_emp_data_USMedical_AK = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_AK = merge(EMP_DAT_CAT_SAN_AK, cu_emp_data_USMedical_AK, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_AK %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3615,8 +3773,10 @@ cu_emp_data_USMedical_AZ = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_AZ = merge(EMP_DAT_CAT_SAN_AZ, cu_emp_data_USMedical_AZ, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_AZ %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3672,8 +3832,10 @@ cu_emp_data_USMedical_CA = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value/3),2))
+
 cpi_emp_data_USMedical_CA = merge(EMP_DAT_CAT_SAN_CA, cu_emp_data_USMedical_CA, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_CA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3717,8 +3879,10 @@ cu_emp_data_USMedical_CO = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_CO = merge(EMP_DAT_CAT_SAN_CO, cu_emp_data_USMedical_CO, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_CO %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3773,8 +3937,10 @@ cu_emp_data_USMedical_FL = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_FL = merge(EMP_DAT_CAT_SAN_FL, cu_emp_data_USMedical_FL, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_FL %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3818,8 +3984,10 @@ cu_emp_data_USMedical_GA = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_GA = merge(EMP_DAT_CAT_SAN_GA, cu_emp_data_USMedical_GA, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_GA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3863,8 +4031,10 @@ cu_emp_data_USMedical_HI = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_HI = merge(EMP_DAT_CAT_SAN_HI, cu_emp_data_USMedical_HI, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_HI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3908,8 +4078,10 @@ cu_emp_data_USMedical_IL = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_IL = merge(EMP_DAT_CAT_SAN_IL, cu_emp_data_USMedical_IL, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_IL %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3953,8 +4125,10 @@ cu_emp_data_USMedical_KS = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_KS = merge(EMP_DAT_CAT_SAN_KS, cu_emp_data_USMedical_KS, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_KS %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -3998,8 +4172,10 @@ cu_emp_data_USMedical_MA = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_MA = merge(EMP_DAT_CAT_SAN_MA, cu_emp_data_USMedical_MA, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_MA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4043,8 +4219,10 @@ cu_emp_data_USMedical_MI = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_MI = merge(EMP_DAT_CAT_SAN_MI, cu_emp_data_USMedical_MI, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_MI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4088,8 +4266,10 @@ cu_emp_data_USMedical_MN = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_MN = merge(EMP_DAT_CAT_SAN_MN, cu_emp_data_USMedical_MN, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_MN %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4133,8 +4313,10 @@ cu_emp_data_USMedical_MO = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_MO = merge(EMP_DAT_CAT_SAN_MO, cu_emp_data_USMedical_MO, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_MO %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4178,8 +4360,10 @@ cu_emp_data_USMedical_NY = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_NY = merge(EMP_DAT_CAT_SAN_NY, cu_emp_data_USMedical_NY, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_NY %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4234,8 +4418,10 @@ cu_emp_data_USMedical_OH = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USMedical_OH = merge(EMP_DAT_CAT_SAN_OH, cu_emp_data_USMedical_OH, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_OH %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4279,8 +4465,10 @@ cu_emp_data_USMedical_OR = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_OR = merge(EMP_DAT_CAT_SAN_OR, cu_emp_data_USMedical_OR, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_OR %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4335,8 +4523,10 @@ cu_emp_data_USMedical_PA = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USMedical_PA = merge(EMP_DAT_CAT_SAN_PA, cu_emp_data_USMedical_PA, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_PA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4385,8 +4575,10 @@ cu_emp_data_USMedical_TX = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USMedical_TX = merge(EMP_DAT_CAT_SAN_TX, cu_emp_data_USMedical_TX, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_TX %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4430,8 +4622,10 @@ cu_emp_data_USMedical_WA = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_WA = merge(EMP_DAT_CAT_SAN_WA, cu_emp_data_USMedical_WA, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_WA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4475,8 +4669,10 @@ cu_emp_data_USMedical_WI = cu_data_USMedical %>%
                                      "base_period")) %>% 
                             group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                             summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USMedical_WI = merge(EMP_DAT_CAT_SAN_WI, cu_emp_data_USMedical_WI, 
                                   by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USMedical_WI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4522,8 +4718,10 @@ cu_data_USEducationAndCommunication_AK = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_AK = merge(EMP_DAT_CAT_SAN_AK, cu_data_USEducationAndCommunication_AK, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_AK %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4567,8 +4765,10 @@ cu_data_USEducationAndCommunication_AZ = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_AZ = merge(EMP_DAT_CAT_SAN_AZ, cu_data_USEducationAndCommunication_AZ, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_AZ %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4624,8 +4824,10 @@ cu_data_USEducationAndCommunication_CA = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value/3),2))
+
 cpi_emp_data_USEducationAndCommunication_CA = merge(EMP_DAT_CAT_SAN_CA, cu_data_USEducationAndCommunication_CA, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_CA %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -4669,8 +4871,10 @@ cu_data_USEducationAndCommunication_CO = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_CO = merge(EMP_DAT_CAT_SAN_CO, cu_data_USEducationAndCommunication_CO, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_CO %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -4725,8 +4929,10 @@ cu_data_USEducationAndCommunication_FL = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_FL = merge(EMP_DAT_CAT_SAN_FL, cu_data_USEducationAndCommunication_FL, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_FL %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -4770,8 +4976,10 @@ cu_data_USEducationAndCommunication_GA = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_GA = merge(EMP_DAT_CAT_SAN_GA, cu_data_USEducationAndCommunication_GA, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_GA %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -4815,8 +5023,10 @@ cu_data_USEducationAndCommunication_HI = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_HI = merge(EMP_DAT_CAT_SAN_HI, cu_data_USEducationAndCommunication_HI, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_HI %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -4860,8 +5070,10 @@ cu_data_USEducationAndCommunication_IL = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_IL = merge(EMP_DAT_CAT_SAN_IL, cu_data_USEducationAndCommunication_IL, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_IL %>%
   ###sample_frac(0.33) %>% 
   DT::datatable()
@@ -4905,8 +5117,10 @@ cu_data_USEducationAndCommunication_KS = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_KS = merge(EMP_DAT_CAT_SAN_KS, cu_data_USEducationAndCommunication_KS, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_KS %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4950,8 +5164,10 @@ cu_data_USEducationAndCommunication_MA = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_MA = merge(EMP_DAT_CAT_SAN_MA, cu_data_USEducationAndCommunication_MA, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_MA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -4995,8 +5211,10 @@ cu_data_USEducationAndCommunication_MI = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_MI = merge(EMP_DAT_CAT_SAN_MI, cu_data_USEducationAndCommunication_MI, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_MI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -5040,8 +5258,10 @@ cu_data_USEducationAndCommunication_MN = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_MN = merge(EMP_DAT_CAT_SAN_MN, cu_data_USEducationAndCommunication_MN, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_MN %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -5085,8 +5305,10 @@ cu_data_USEducationAndCommunication_MO = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_MO = merge(EMP_DAT_CAT_SAN_MO, cu_data_USEducationAndCommunication_MO, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_MO %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -5131,8 +5353,10 @@ cu_data_USEducationAndCommunication_NY = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_NY = merge(EMP_DAT_CAT_SAN_NY, cu_data_USEducationAndCommunication_NY, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_NY %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -5187,8 +5411,10 @@ cu_data_USEducationAndCommunication_OH = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USEducationAndCommunication_OH = merge(EMP_DAT_CAT_SAN_OH, cu_data_USEducationAndCommunication_OH, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_OH %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -5232,8 +5458,10 @@ cu_data_USEducationAndCommunication_OR = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_OR = merge(EMP_DAT_CAT_SAN_OR, cu_data_USEducationAndCommunication_OR, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_OR %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -5288,8 +5516,10 @@ cu_data_USEducationAndCommunication_PA = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USEducationAndCommunication_PA = merge(EMP_DAT_CAT_SAN_PA, cu_data_USEducationAndCommunication_PA, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_PA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -5338,8 +5568,10 @@ cu_data_USEducationAndCommunication_TX = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value)/2,2))
+
 cpi_emp_data_USEducationAndCommunication_TX = merge(EMP_DAT_CAT_SAN_TX, cu_data_USEducationAndCommunication_TX, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_TX %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -5383,8 +5615,10 @@ cu_data_USEducationAndCommunication_WA = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_WA = merge(EMP_DAT_CAT_SAN_WA, cu_data_USEducationAndCommunication_WA, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_WA %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -5428,8 +5662,10 @@ cu_data_USEducationAndCommunication_WI = cu_data_USEducationAndCommunication %>%
                                                    "base_period")) %>% 
                                           group_by(industry, state, parent_item_code, emp_line_code, year, area_code, area_name) %>% 
                                           summarise(cpi_value = round(sum(value),2))
+
 cpi_emp_data_USEducationAndCommunication_WI = merge(EMP_DAT_CAT_SAN_WI, cu_data_USEducationAndCommunication_WI, 
                                                     by.x=c("LineCode","Year"), by.y=c("emp_line_code","year"))
+
 cpi_emp_data_USEducationAndCommunication_WI %>%
 #  sample_frac(0.33) %>% 
   DT::datatable()
@@ -5540,14 +5776,65 @@ cpi_emp_data_Combined <- rbind(cpi_emp_data_USFoodBeverage_AK,
 cpi_emp_data_Combined %>%
   sample_frac(0.33) %>% 
   DT::datatable()
+
+write.csv(cpi_emp_data_Combined,'cpi_emp_data_Combined.csv')
 ```
 
+# Hypothesis Test {.tabset .tabset-fade .tabset-pills}
 
+## T-Test
 
+```{r, include=TRUE, eval=FALSE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+ggplot(cpi_emp_data_Combined) +
+  aes(x = paste0(state, '-', industry), y = cpi_value) +
+  geom_boxplot() +
+  theme_minimal() + 
+  theme(axis.text.x=element_text(size=5, angle=90)) + 
+  labs(title = "T-Test",
+       y = "CPI", 
+       x  = "State-Industry", 
+       fill = "State", 
+       subtitle = "CPI vs State-Industry", 
+       caption = "Source: Employment from Select Industry by State")
+  coord_flip()
 
+test <- t.test(cpi_emp_data_Combined$"Number of jobs", 
+               cpi_emp_data_Combined$cpi_value,
+               alternative = "two.sided", 
+               var.equal = FALSE)
+ 
+paste("p-value", test$p.value)
+ 
+ggplot(cpi_emp_data_Combined) +
+  aes(x = "Number of jobs", y = cpi_value ) +
+  geom_boxplot() +
+  theme_minimal() + 
+  theme(axis.text.x=element_text(size=5, angle=90)) + 
+  labs(title = "T-Test",
+       y = "CPI", 
+       x  = "Number of jobs", 
+       fill = "State", 
+       subtitle = "Number of jobs vs CPI", 
+       caption = "Source: Employment from Select Industry by State")
+  coord_flip()
+
+### Partial Least Squares regression model
+###anova(model_pls, test = 'Chisq')
+```
+
+## ANOVA Tests
+```{r, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+### Generlaized Linear regression Model
+###anova(model_glm, test = 'Chisq')
+```
+
+## Chi-Squared Test
+```{r, include=TRUE, eval=TRUE, message=FALSE, warning=FALSE, echo=TRUE, results='show'}
+### Linear Regression Model
+###anova(lm, test = 'Chisq')
+```
 
 # Joe's Work
-
 
 ```{r}
 ALL_FB <-rbind(cpi_emp_data_USFoodBeverage_AK,
@@ -5595,6 +5882,7 @@ ALL_HOUSING <- rbind( cpi_emp_data_USHousing_AK,
                                 cpi_emp_data_USHousing_WA,
                                 cpi_emp_data_USHousing_WI)
 ```
+
 
 
 ```{r}
@@ -5692,6 +5980,11 @@ NEW_ALL_EDUCATION <- as.data.frame(ALL_EDUCATION[,c("Year","Description", "Numbe
 
 
 
+
+
+
+
+
 ## Food and Beverage Graphs
 
 
@@ -5725,15 +6018,21 @@ b_fb_2 = fbg %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplo
 figure_fb <- ggarrange(b_fb_1, b_fb_2, 
           ncol = 2, nrow = 1)
 
-annotate_figure(figure_fb,
-                top = text_grob("Total Food & Beverage", color = "red", face = "bold", size = 14),
-                bottom = text_grob("Data source: \n BLS", color = "blue",
-                                   hjust = 1, x = 1, face = "italic", size = 10)
+figure_fb_2 <- annotate_figure(figure_fb,
+                top = text_grob("Total Food & Beverage", color = "red", face = "bold", size = 10)
                 )
 
 ```
 
 
+
+```{r}
+ggplot(fbg, aes(x = fbg$Year, y = fbg$`Number of jobs`)) +
+  geom_line() +
+  labs(title = "Personal Savings Rate",
+       x = "Date",
+       y = "Personal Savings Rate")
+```
 
 
 
@@ -5743,6 +6042,20 @@ df <- fbg %>%
   gather(key = "variable", value = "value", -Year)
 head(df, 3)
 ```
+
+```{r}
+ggplot(df, aes(x = Year, y = value)) + 
+  geom_line(aes(color = variable), size = 1) +
+  scale_color_manual(values = c("#00AFBB", "#E7B800")) +
+  theme_minimal()
+```
+
+
+```{r}
+fbg1 <- fbg %>% arrange(desc(cpi_value))
+head(fbg1, 1) 
+```
+
 
 
 
@@ -5756,7 +6069,9 @@ hg
 
 ```{r}
 hg$`Number of jobs` <- as.numeric(hg$`Number of jobs`)
-hg %>% arrange(desc(cpi_value))
+
+hg1 <- hg %>% arrange(desc(cpi_value))
+head(hg1,1)
 ```
 
 
@@ -5773,11 +6088,12 @@ b_h_2 = hg %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(
 figure_h_1 <- ggarrange(b_h_1, b_h_2, 
           ncol = 2, nrow = 1)
 
-annotate_figure(figure_h_1,
-                top = text_grob("Total Housing", color = "red", face = "bold", size = 14),
-                bottom = text_grob("Data source: \n BLS", color = "blue",
-                                   hjust = 1, x = 1, face = "italic", size = 10)
+figure_h_2 <- annotate_figure(figure_h_1,
+                top = text_grob("Total Housing", color = "red", face = "bold", size = 10)
+
                 )
+
+
 ```
 
 ## Trasportation Graph
@@ -5788,8 +6104,8 @@ tg <- NEW_ALL_TRANSPORT
 
 ```{r}
 tg$`Number of jobs` <- as.numeric(tg$`Number of jobs`)
-tg %>% arrange(desc(cpi_value))
-
+tg1 <- tg %>% arrange(desc(cpi_value))
+head(tg1, 1)
 ```
 
 
@@ -5805,11 +6121,14 @@ b_t_2 = tg %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(
 figure_t <- ggarrange(b_t_1, b_t_2, 
           ncol = 2, nrow = 1)
 
-annotate_figure(figure_t,
-                top = text_grob("Total Transportation", color = "red", face = "bold", size = 14),
-                bottom = text_grob("Data source: \n BLS", color = "blue",
-                                   hjust = 1, x = 1, face = "italic", size = 10)
+
+
+figure_t_2 <- annotate_figure(figure_t,
+                top = text_grob("Total Transportation", color = "red", face = "bold", size = 10)
+                
                 )
+
+
 ```
 
 ## Medical Graphs
@@ -5822,7 +6141,9 @@ mg
 
 ```{r}
 mg$`Number of jobs` <- as.numeric(mg$`Number of jobs`)
-mg %>% arrange(desc(cpi_value))
+#mg %>% arrange(desc(cpi_value))
+mg1 <- mg %>% arrange(desc(cpi_value),1)
+head(mg1, 1)
 
 ```
 
@@ -5840,10 +6161,8 @@ b_m_2 = mg %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(
 figure_m <- ggarrange(b_m_1, b_m_2, 
           ncol = 2, nrow = 1)
 
-annotate_figure(figure_m,
-                top = text_grob("Total Medical", color = "red", face = "bold", size = 14),
-                bottom = text_grob("Data source: \n BLS", color = "blue",
-                                   hjust = 1, x = 1, face = "italic", size = 10)
+figure_m_2 <- annotate_figure(figure_m,
+                top = text_grob("Total Medical", color = "red", face = "bold", size = 10)
                 )
 ```
 
@@ -5858,8 +6177,12 @@ eg
 
 ```{r}
 eg$`Number of jobs` <- as.numeric(eg$`Number of jobs`)
-eg %>% arrange(desc(cpi_value))
 
+eg1 <- eg %>% arrange(desc(cpi_value))
+
+head(eg1, 1)
+
+  
 ```
 
 
@@ -5872,15 +6195,43 @@ b_e_2 = eg %>% select(c("Year","Sector"= "Description","cpi_value")) %>% ggplot(
   labs(title = "CPI",
        y = "Sector",x= "Years")
 
-figure_e <- ggarrange(b_e_1, b_e_2, 
+figure_e <- ggarrange(b_e_1, b_e_2,
           ncol = 2, nrow = 1)
 
-annotate_figure(figure_e,
-                top = text_grob("Total Education", color = "red", face = "bold", size = 14),
-                bottom = text_grob("Data source: \n BLS", color = "blue",
+figure_e_2 <- annotate_figure(figure_e,
+                top = text_grob("Total Education", color = "red", face = "bold", size = 10)
+                )
+
+
+```
+
+
+
+```{r}
+fb2<- as.data.frame(fbg1[1,])
+eg2<- as.data.frame(eg1[1,])
+mg2 <- as.data.frame(mg1[1,])
+hg2 <- as.data.frame(hg1[1,])
+tg2 <- as.data.frame(tg1[1,])
+
+combinedf <- rbind(fb2, eg2, mg2, hg2, tg2)
+combinedf1 <- combinedf %>% arrange(desc(cpi_value))
+
+combinedf1
+```
+
+```{r}
+
+figure_all <- ggarrange(figure_h_2, figure_t_2, figure_fb_2, figure_m_2, figure_e_2, 
+          ncol = 1, nrow = 5)
+
+industry_all_figure <- annotate_figure(figure_all,
+                top = text_grob("Industries", color = "blue", face = "bold", size = 10),
+                bottom = text_grob("Data source: \n BLS", color = "black",
                                    hjust = 1, x = 1, face = "italic", size = 10)
                 )
 ```
+
 
 
 
@@ -6064,7 +6415,7 @@ NEW_ALL_AK <- as.data.frame(ALL_AK[,c("Year","Description", "Number of jobs","cp
 
 
 ```{r}
-NEW_ALL_AZ <- as.data.frame(ALL_AK[,c("Year","Description", "Number of jobs","cpi_value")])
+NEW_ALL_AZ <- as.data.frame(ALL_AZ[,c("Year","Description", "Number of jobs","cpi_value")])
 ```
 
 
@@ -6126,9 +6477,6 @@ NEW_ALL_OH <- as.data.frame(ALL_OH[,c("Year","Description", "Number of jobs","cp
 NEW_ALL_OR <- as.data.frame(ALL_OR[,c("Year","Description", "Number of jobs","cpi_value")])
 ```
 
-```{r}
-NEW_ALL_MI <- as.data.frame(ALL_MI[,c("Year","Description", "Number of jobs","cpi_value")])
-```
 
 ```{r}
 NEW_ALL_PA <- as.data.frame(ALL_PA[,c("Year","Description", "Number of jobs","cpi_value")])
@@ -6326,7 +6674,7 @@ annotate_figure(figure16,
 
 
 ```{r}
-h1 <- NEW_ALL_AK %>% filter(Description=="Health care and social assistance")
+h1 <- NEW_ALL_AZ %>% filter(Description=="Health care and social assistance")
 h1
 ```
 
@@ -6429,7 +6777,7 @@ annotate_figure(figure8,
 
 
 ```{r}
-r1 <- NEW_ALL_AK %>% filter(Description=="Real estate and rental and leasing")
+r1 <- NEW_ALL_AZ %>% filter(Description=="Real estate and rental and leasing")
 r1
 ```
 
@@ -9371,7 +9719,7 @@ annotate_figure(figure99,
 
 ```{r}
 r19 <- NEW_ALL_WA %>% filter(Description=="Real estate and rental and leasing")
-r
+
 ```
 
 ```{r}
@@ -9608,6 +9956,261 @@ annotate_figure(figure106,
                 )
 ```
 
+
+
+```{r}
+ak_r <- r2
+
+az_r <- r1
+
+ca_r <- r3
+
+co_r <- r4
+
+fl_r <- r5
+
+ga_r <- r6
+
+hi_r <- h7
+
+il_r <- r8
+
+ks_r <- r9
+
+ma_r <- r10
+
+mi_r <- r11
+
+mn_r <- r12
+
+mo_r <- r13
+
+ny_r <- r
+
+oh_r <- r14
+
+or_r <- r16
+
+
+pa_r <- r17
+
+tx_r <- r18
+
+wa_r <- r19
+
+wi_r <- r20
+
+```
+
+```{r}
+ak_r_1 <- ak_r %>% arrange(desc(cpi_value))
+
+head(ak_r_1, 5)
+```
+
+
+```{r}
+ak_r_2<- as.data.frame(ak_r_1[1,])
+ak_r_2
+```
+
+```{r}
+az_r_1 <- az_r %>% arrange(desc(cpi_value))
+az_r_2<- as.data.frame(az_r_1[1,])
+az_r_2
+```
+
+
+```{r}
+ca_r_1 <- ca_r %>% arrange(desc(cpi_value))
+ca_r_2<- as.data.frame(ca_r_1[1,])
+ca_r_2
+```
+
+
+```{r}
+co_r_1 <- co_r %>% arrange(desc(cpi_value))
+co_r_2<- as.data.frame(co_r_1[1,])
+co_r_2
+```
+
+```{r}
+fl_r_1 <- fl_r %>% arrange(desc(cpi_value))
+fl_r_2<- as.data.frame(fl_r_1[1,])
+fl_r_2
+```
+
+
+```{r}
+ga_r_1 <- ga_r %>% arrange(desc(cpi_value))
+ga_r_2<- as.data.frame(ga_r_1[1,])
+ga_r_2
+```
+
+```{r}
+hi_r_1 <- hi_r %>% arrange(desc(cpi_value))
+hi_r_2<- as.data.frame(hi_r_1[1,])
+hi_r_2
+```
+
+
+
+```{r}
+il_r_1 <- il_r %>% arrange(desc(cpi_value))
+il_r_2<- as.data.frame(il_r_1[1,])
+il_r_2
+```
+
+
+```{r}
+ks_r_1 <- ks_r %>% arrange(desc(cpi_value))
+ks_r_2<- as.data.frame(ks_r_1[1,])
+ks_r_2
+```
+
+
+```{r}
+ma_r_1 <- ma_r %>% arrange(desc(cpi_value))
+ma_r_2<- as.data.frame(ma_r_1[1,])
+ma_r_2
+```
+
+```{r}
+mi_r_1 <- mi_r %>% arrange(desc(cpi_value))
+mi_r_2<- as.data.frame(mi_r_1[1,])
+mi_r_2
+```
+
+
+
+```{r}
+mn_r_1 <- mn_r %>% arrange(desc(cpi_value))
+mn_r_2<- as.data.frame(mn_r_1[1,])
+mn_r_2
+```
+
+
+```{r}
+mo_r_1 <- mo_r %>% arrange(desc(cpi_value))
+mo_r_2<- as.data.frame(mo_r_1[1,])
+mo_r_2
+```
+
+
+```{r}
+ny_r_1 <- ny_r %>% arrange(desc(cpi_value))
+ny_r_2<- as.data.frame(ny_r_1[1,])
+ny_r_2
+```
+
+```{r}
+oh_r_1 <- oh_r %>% arrange(desc(cpi_value))
+oh_r_2<- as.data.frame(oh_r_1[1,])
+oh_r_2
+```
+
+
+```{r}
+or_r_1 <-or_r %>% arrange(desc(cpi_value))
+or_r_2<- as.data.frame(or_r_1[1,])
+or_r_2
+```
+
+
+```{r}
+pa_r_1 <- pa_r %>% arrange(desc(cpi_value))
+pa_r_2<- as.data.frame(pa_r_1[1,])
+pa_r_2
+```
+
+
+```{r}
+tx_r_1 <- tx_r %>% arrange(desc(cpi_value))
+tx_r_2<- as.data.frame(tx_r_1[1,])
+tx_r_2
+```
+
+```{r}
+wa_r_1 <- wa_r %>% arrange(desc(cpi_value))
+wa_r_2<- as.data.frame(wa_r_1[1,])
+wa_r_2
+```
+
+
+```{r}
+wi_r_1 <- wi_r %>% arrange(desc(cpi_value))
+wi_r_2<- as.data.frame(wi_r_1[1,])
+wi_r_2
+```
+
+
+
+r_combinedf <- rbind(ak_r_2, az_r_2, ca_r_2, co_r_2, fl_r_2, ga_r_2, hi_r_2, il_r_2, ks_r_2, ma_r_2, mi_r_2, mn_r_2, mo_r_2, ny_r_2, oh_r_2, or_r_2, pa_r_2, tx_r_2, wa_r_2, wi_r_2)
+r_combinedf1 <- r_combinedf %>% arrange(desc(cpi_value))
+
+r_combinedf1
+
+
+```{r}
+r_combinedf <- rbind(ak_r_2, az_r_2, ca_r_2, co_r_2, fl_r_2, ga_r_2, hi_r_2, il_r_2, ks_r_2, ma_r_2, mi_r_2, mn_r_2, mo_r_2, ny_r_2, oh_r_2, or_r_2, pa_r_2, tx_r_2, wa_r_2, wi_r_2)
+
+r_combinedf
+
+r_combindf <- data.frame(state = c("AK", "AZ", "CA", "CO", "FL", "GA", "HI", "IL", "KS", "MA", "MI", "MN", "MO", "NY", "OH", "OR", "PA", "TX", "WA", "WI"), r_combinedf)
+
+r_combindf
+
+```
+
+
+```{r}
+r_combindf1 <- r_combindf %>% arrange(desc(cpi_value))
+
+r_combindf1
+```
+
+
+
+```{r} 
+
+figure_ny_r <- annotate_figure(figure5,
+                top = text_grob("NY", color = "red", face = "bold", size = 10),
+                          )
+
+figure_wa_r <- annotate_figure(figure100,
+                top = text_grob("WA", color = "red", face = "bold", size = 10),
+                          )
+
+figure_ma_r <- annotate_figure(figure60,
+                top = text_grob("MA", color = "red", face = "bold", size = 10),
+                          )
+
+figure_il_r <- annotate_figure(figure50,
+                top = text_grob("IL", color = "red", face = "bold", size = 10),
+                          )
+
+figure_ca_r <- annotate_figure(figure22,
+                top = text_grob("CA", color = "red", face = "bold", size = 10),
+                          )
+
+
+figure_r_top_5 <- ggarrange(figure_ny_r, figure_wa_r, figure_ma_r, figure_il_r, figure_ca_r, 
+          ncol = 1, nrow = 5)
+
+real_estate_figure <- annotate_figure(figure_r_top_5,
+                top = text_grob("Real Estate Top CPI Values", color = "blue", face = "bold", size = 10),
+                bottom = text_grob("Data source: \n BLS", color = "black",
+                                   hjust = 1, x = 1, face = "italic", size = 10)
+                )
+```
+
+
+
+
+
+
+
+
 # RAJWANT WORK
 ```{r}
 cpi_emp_data_USFoodBeverage_NY %>% 
@@ -9618,6 +10221,7 @@ cpi_emp_data_USFoodBeverage_NY %>%
     theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86))) +
     labs(title = "USSFoodBeverage Data for No. Of Jobs and CPI Value in NY",
          y="Sector", x="Years") 
+
 cpi_emp_data_USFoodBeverage_NY %>% 
     select(c("Year","Sector"= "Description","No_Jobs"="Number of jobs")) %>% 
     ggplot(mapping = aes(x= Year, y=(as.numeric(No_Jobs)))) + 
@@ -9625,6 +10229,7 @@ cpi_emp_data_USFoodBeverage_NY %>%
     theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86))) +
     labs(title = "USSFoodBeverage Data for No. Of Jobs  in NY",
          y="Sector", x="Years") 
+
 cpi_emp_data_USFoodBeverage_NY %>% 
     select(c("Year","Sector"= "Description","cpi_value")) %>% 
     ggplot(mapping = aes(x= Year, y=(as.numeric(cpi_value)))) + 
@@ -9632,6 +10237,7 @@ cpi_emp_data_USFoodBeverage_NY %>%
     theme(axis.text.x = element_text(angle = 60, colour="gray",hjust = 1,size=rel(0.86))) +
     labs(title = "USSFoodBeverage Data for CPI Value in NY",
          y = "Sector",x= "Years") 
+
 # summary(as.numeric(cpi_emp_data_USFoodBeverage_NY$`Number of jobs`))
 # summary(as.numeric(cpi_emp_data_USFoodBeverage_NY$cpi_value))
 # 
@@ -9639,37 +10245,30 @@ cpi_emp_data_USFoodBeverage_NY %>%
 # levels(quantile(as.numeric(cpi_emp_data_USFoodBeverage_NY$cpi_value)))
 ```
 
-
-```{r}
-ALL_NY <- rbind(cpi_emp_data_USTransportation_NY,
-       cpi_emp_data_USMedical_NY,
-       cpi_emp_data_USHousing_NY,
-       cpi_emp_data_USFoodBeverage_NY,
-      cpi_emp_data_USEducationAndCommunication_NY)
-```
-
-
-
-
 ## Model
 ```{r}
 #library(DataExplorer)
 #library(plot_histogram)
 library(lazytrade)
+
 ALL_NY <- rbind(cpi_emp_data_USTransportation_NY,
                 cpi_emp_data_USMedical_NY,
                 cpi_emp_data_USHousing_NY,
                 cpi_emp_data_USFoodBeverage_NY,
                 cpi_emp_data_USEducationAndCommunication_NY)
+
 #DataExplorer::plot_missing(ALL_NY, title = "Beverage Training Data: % Missing Values by Data Element")
+
 ALL_NY$`Number of jobs` = as.numeric(ALL_NY$`Number of jobs`)
 #plot_histogram(ALL_NY, ggtheme=theme_light())
 #plot_correlation(ALL_NY[,c(2,5,9)])
+
 ggplot(ALL_NY[,c("Year","Description","Number of jobs","cpi_value")], 
         mapping=aes(y= log(cpi_value), 
         x=Year,
         color= Description, 
         group = Description)) + geom_smooth() + theme_classic()
+
 ggplot(ALL_NY[,c("Year","Description","Number of jobs","cpi_value")], 
         mapping=aes(y= log(`Number of jobs`), 
         x=Year,
@@ -9679,8 +10278,10 @@ ggplot(ALL_NY[,c("Year","Description","Number of jobs","cpi_value")],
 
 ```{r}
 ALL_NY
+
 ALL_NY_M <- ALL_NY[,c("Year","Number of jobs","parent_item_code","cpi_value")]
 names(ALL_NY_M) = c("Year", "Jobs", "C_Item","CPI")
+
 # ALL_NY_M$Year = as.character(ALL_NY_M$Year)
 # ALL_NY_M$E_Area = as.character(ALL_NY_M$E_Area)
 library(caret)
@@ -9690,48 +10291,61 @@ trainIndex <- createDataPartition(ALL_NY_M$Jobs, p = .8,
                                   times = 1)
 ALL_NY_train <- ALL_NY_M[ trainIndex,]
 ALL_NY_test  <- ALL_NY_M[-trainIndex,]
+
 head(ALL_NY_M)
 ```
 
 ```{r}
 metric = 'RMSE'
 head(ALL_NY_train )
+
 # Train control
 customTrainControl <- trainControl(method = "repeatedcv", 
                                    number = 10 , 
                                    repeats = 5 ,
                                    verboseIter = F)
+
 # Linear Model
 lm <- train(Jobs ~ .,
             ALL_NY_train,
             method= 'lm',
             trControl = customTrainControl)
 lm$results
+
 summary(lm)
 par(mfrow=c(2,2))
 plot(lm$finalModel)
+
 #--------------
 # https://stackoverflow.com/questions/44200195/how-to-debug-contrasts-can-be-applied-only-to-factors-with-2-or-more-levels-er
 ALL_NY_train %>% dplyr::mutate_all(as.factor) %>% str
+
 unique(ALL_NY$area_code)
+
 # multiple LM
 lm_cpi_item <- lm(Jobs ~ CPI+C_Item,ALL_NY_train)
 summary(lm_cpi_item)
+
 lm_cpi2_item <- lm(Jobs ~ (CPI^2)+C_Item,ALL_NY_train)
 summary(lm_cpi2_item)
+
 lm_cpi_year <- lm(Jobs ~ CPI+Year,ALL_NY_train)
 summary(lm_cpi_year)
+
 xyplot(ALL_NY_test$Jobs ~ predict(lm),
  ## plot the points (type = 'p') and a background grid ('g')
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Observed")
+
 xyplot(ALL_NY_test$Jobs ~ predict(lm_cpi_year),
  ## plot the points (type = 'p') and a background grid ('g')
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Observed")
+
 xyplot(resid(lm_cpi_year) ~ predict(lm_cpi_year),
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Residuals")
+
 #PLS
 # Useing train perform  to perfrom  pre-process and tuning together. The function first preprocess the training set by centering it and scaling it. Then the function uses 10-fold cross validation to try the number of components, i.e. latent variables, of the PLS model from 1 to 20.
 # # The train function generates a resampling estimate of performance. Because
@@ -9739,6 +10353,7 @@ xyplot(resid(lm_cpi_year) ~ predict(lm_cpi_year),
 # reasonable estimates of model performance. The function trainControl specifies
 # the type of resampling:
 ctrl <- trainControl(method = "cv", number = 10)
+
 model_pls<- train(Jobs ~ .,   ALL_NY_train,
                      method = "pls",
                      tuneLength = 20,
@@ -9746,7 +10361,9 @@ model_pls<- train(Jobs ~ .,   ALL_NY_train,
                      trControl = ctrl,
                      preProc = c("center", "scale"))
 model_pls
+
 model_pls$results[3,2:4]
+
 # M
 model_glm<- train(Jobs ~ .,   ALL_NY_train,
                      method = "glm",
@@ -9761,40 +10378,49 @@ model_glm
 test_model(test_dataset = model_pls,
            predictor_dataset = ALL_NY_train,
            test_type = "regression")
+
 # TEST MODEL with Train  data
 xyplot(ALL_NY_train$Jobs ~ predict(model_pls),
  ## plot the points (type = 'p') and a background grid ('g')
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Observed")
+
 xyplot(ALL_NY_train$Jobs ~ predict(lm),
  ## plot the points (type = 'p') and a background grid ('g')
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Observed")
+
 xyplot(ALL_NY_train$Jobs ~ predict(lm_cpi2_item),
  ## plot the points (type = 'p') and a background grid ('g')
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Observed")
+
 xyplot(ALL_NY_train$Jobs ~ predict(lm_cpi_item),
  ## plot the points (type = 'p') and a background grid ('g')
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Observed")
+
 xyplot(ALL_NY_train$Jobs ~ predict(model_glm),
  ## plot the points (type = 'p') and a background grid ('g')
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Observed")
+
 # TEST MODEL with TEst data
 xyplot(ALL_NY_test$Jobs ~ predict(model_pls,ALL_NY_test),
  ## plot the points (type = 'p') and a background grid ('g')
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Observed")
+
 xyplot(ALL_NY_test$Jobs ~ predict(lm,ALL_NY_test),
  ## plot the points (type = 'p') and a background grid ('g')
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Observed")
+
 xyplot(ALL_NY_test$Jobs ~ predict(lm_cpi_item,ALL_NY_test),
  ## plot the points (type = 'p') and a background grid ('g')
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Observed")
+
 # REssidual Plot with train data
 xyplot(resid(model_pls) ~ predict(model_pls),
  type = c("p", "g"),
@@ -9803,6 +10429,7 @@ xyplot(resid(model_pls) ~ predict(model_pls),
 xyplot(resid(lm) ~ predict(lm),
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Residuals")
+
 xyplot(resid(lm_cpi_item) ~ predict(lm_cpi_item),
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Residuals")
@@ -9810,6 +10437,7 @@ xyplot(resid(lm_cpi_item) ~ predict(lm_cpi_item),
 xyplot(resid(lm_cpi2_item) ~ predict(lm_cpi2_item),
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Residuals")
+
 xyplot(resid(lm_cpi2_item) ~ predict(lm_cpi2_item),
  type = c("p", "g"),
  xlab = "Predicted", ylab = "Residuals")
@@ -9837,6 +10465,7 @@ data.frame("lm_cpi_year Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,p
            "MAPE" =  MLmetrics::MAPE(predict(lm_cpi_year, ALL_NY_test),ALL_NY_test$Jobs))
 data.frame("PLS Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(model_pls, ALL_NY_test))),
            "MAPE" =  MLmetrics::MAPE(predict(model_pls, ALL_NY_test),ALL_NY_test$Jobs))
+
 cbind(data.frame("LM Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm, ALL_NY_test))),
                  "MAPE" =  MLmetrics::MAPE(predict(lm, ALL_NY_test),ALL_NY_test$Jobs)),
       data.frame("lm_cpi2_item Model"= defaultSummary(data.frame(obs=ALL_NY_test$Jobs,pred=predict(lm_cpi2_item, ALL_NY_test))),
